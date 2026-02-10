@@ -1,0 +1,130 @@
+
+import React, { useState } from 'react';
+import { useStore } from '../context/StoreContext';
+
+const AddSaleForm = ({ onSuccess }) => {
+    const { addSale } = useStore();
+    const [formData, setFormData] = useState({
+        customerName: '',
+        phoneNumber: '',
+        note: '',
+        totalPrice: '',
+        durationMonths: '12',
+        startDate: new Date().toISOString().split('T')[0]
+    });
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!formData.customerName || !formData.totalPrice) return;
+
+        addSale({
+            ...formData,
+            totalPrice: Number(formData.totalPrice),
+            durationMonths: Number(formData.durationMonths)
+        });
+
+        // Reset form
+        setFormData({
+            customerName: '',
+            phoneNumber: '',
+            note: '',
+            totalPrice: '',
+            durationMonths: '12',
+            startDate: new Date().toISOString().split('T')[0]
+        });
+
+        alert("Sotuv muvaffaqiyatli qo'shildi!");
+        if (onSuccess) onSuccess();
+    };
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <div className="grid-cols-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                <div>
+                    <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Mijoz F.I.O</label>
+                    <input
+                        className="input"
+                        name="customerName"
+                        placeholder="Masalan: Eshmat Toshmatov"
+                        value={formData.customerName}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+                <div>
+                    <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Telefon Raqam</label>
+                    <input
+                        className="input"
+                        name="phoneNumber"
+                        placeholder="+998 90 123 45 67"
+                        value={formData.phoneNumber}
+                        onChange={handleChange}
+                    />
+                </div>
+            </div>
+
+            <div className="grid-cols-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                <div>
+                    <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Umumiy Narx ($)</label>
+                    <input
+                        className="input"
+                        name="totalPrice"
+                        type="number"
+                        placeholder="1200"
+                        value={formData.totalPrice}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+                <div>
+                    <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Muddat (oy)</label>
+                    <input
+                        className="input"
+                        name="durationMonths"
+                        type="number"
+                        placeholder="12"
+                        value={formData.durationMonths}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+            </div>
+
+            <div className="grid-cols-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+                <div>
+                    <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Boshlanish Sanasi</label>
+                    <input
+                        className="input"
+                        name="startDate"
+                        type="date"
+                        value={formData.startDate}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+                <div>
+                    <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Izoh</label>
+                    <input
+                        className="input"
+                        name="note"
+                        placeholder="Model, xotira, rang..."
+                        value={formData.note}
+                        onChange={handleChange}
+                    />
+                </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button type="submit" className="btn btn-primary">
+                    Sotuvni Saqlash
+                </button>
+            </div>
+        </form>
+    );
+};
+
+export default AddSaleForm;
