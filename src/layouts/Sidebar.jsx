@@ -5,7 +5,6 @@ import { LayoutDashboard, ShoppingCart, CreditCard, Users, Settings, LogOut } fr
 
 const Sidebar = () => {
     const navItems = [
-        { icon: <LayoutDashboard size={20} />, label: 'Boshqaruv Paneli', path: '/' },
         { icon: <ShoppingCart size={20} />, label: 'Sotuvlar', path: '/sales' },
     ];
 

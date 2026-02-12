@@ -10,10 +10,8 @@ const MainLayout = () => {
     // Determine page title based on path
     const getTitle = () => {
         switch (location.pathname) {
-            case '/': return 'Boshqaruv Paneli';
+            case '/':
             case '/sales': return 'Sotuvlar';
-            case '/payments': return "To'lovlar";
-            case '/customers': return 'Mijozlar';
             default: return 'Boshqaruv';
         }
     };

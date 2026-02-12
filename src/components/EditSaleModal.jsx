@@ -4,15 +4,24 @@ import { useStore } from '../context/StoreContext';
 import { X, DollarSign, Save } from 'lucide-react';
 
 const EditSaleModal = ({ sale, onClose }) => {
-    const { updatePaidAmount } = useStore();
+    const { updateSale } = useStore();
     const [amount, setAmount] = useState(sale.paidAmount || 0);
 
-    const handleSave = () => {
-        updatePaidAmount(sale.id, Number(amount));
-        onClose();
+    const handleSave = async () => {
+        const success = await updateSale(sale.id, { paidAmount: Number(amount) });
+        if (success) {
+            onClose();
+        } else {
+            alert("Xatolik yuz berdi");
+        }
     };
 
     const percentage = Math.min(100, Math.round(((amount || 0) / sale.totalPrice) * 100));
+
+    const formatPrice = (val) => {
+        if (sale.currency === 'UZS') return `${val.toLocaleString()} so'm`;
+        return `$${val.toLocaleString()}`;
+    };
 
     return (
         <div style={{
@@ -44,15 +53,15 @@ const EditSaleModal = ({ sale, onClose }) => {
                 <div className="mb-4" style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px' }}>
                     <div className="flex-between mb-4">
                         <span className="text-muted">Umumiy Qarz:</span>
-                        <span style={{ fontWeight: 'bold' }}>${sale.totalPrice}</span>
+                        <span style={{ fontWeight: 'bold' }}>{formatPrice(sale.totalPrice)}</span>
                     </div>
 
                     <div style={{ marginBottom: '8px' }}>
                         <label className="text-sm" style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
-                            To'langan Summa ($)
+                            To'langan Summa ({sale.currency})
                         </label>
                         <div style={{ position: 'relative' }}>
-                            <DollarSign size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                            {sale.currency === 'USD' ? <DollarSign size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} /> : <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: '0.8rem' }}>UZS</span>}
                             <input
                                 type="number"
                                 className="input"
@@ -68,7 +77,7 @@ const EditSaleModal = ({ sale, onClose }) => {
                         <div className="flex-between text-sm mb-4">
                             <span>Jarayon: {percentage}%</span>
                             <span style={{ color: percentage >= 100 ? 'var(--success)' : 'var(--text-primary)' }}>
-                                {percentage >= 100 ? "To'liq to'landi" : `$${sale.totalPrice - amount} qoldi`}
+                                {percentage >= 100 ? "To'liq to'landi" : `${formatPrice(sale.totalPrice - amount)} qoldi`}
                             </span>
                         </div>
                         <div style={{ height: '8px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>

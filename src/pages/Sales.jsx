@@ -6,7 +6,7 @@ import AddSaleForm from '../components/AddSaleForm';
 import EditSaleModal from '../components/EditSaleModal';
 
 const Sales = () => {
-    const { sales, deleteSale } = useStore();
+    const { sales, deleteSale, loading } = useStore();
     const [searchTerm, setSearchTerm] = useState('');
     const [showAddModal, setShowAddModal] = useState(false);
     const [editingSale, setEditingSale] = useState(null);
@@ -27,6 +27,13 @@ const Sales = () => {
         });
     };
 
+    const formatPrice = (amount, currency) => {
+        if (currency === 'UZS') {
+            return `${amount.toLocaleString()} so'm`;
+        }
+        return `$${amount.toLocaleString()}`;
+    };
+
     const calculatePaidAmount = (sale) => {
         return sale.paidAmount || 0;
     };
@@ -34,7 +41,6 @@ const Sales = () => {
     const getStatus = (sale) => {
         const paid = calculatePaidAmount(sale);
         const total = sale.totalPrice;
-        // Avoid division by zero if total is 0 (unlikely but safe)
         if (total > 0 && paid >= total) return <span className="badge badge-success">Yopilgan</span>;
         if (paid > 0) return <span className="badge badge-pending">Jarayonda</span>;
         return <span className="badge badge-danger">Boshlanmagan</span>;
@@ -76,8 +82,8 @@ const Sales = () => {
                 <table className="data-table">
                     <thead>
                         <tr>
-                            <th>Mijoz</th>
                             <th>Sana</th>
+                            <th>Mijoz</th>
                             <th>Telefon</th>
                             <th>Mahsulot</th>
                             <th>Narx</th>
@@ -87,14 +93,20 @@ const Sales = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredSales.map(sale => (
+                        {loading && sales.length === 0 ? (
+                            <tr>
+                                <td colSpan={8} style={{ textAlign: 'center', padding: '32px' }}>
+                                    <div className="text-muted">Yuklanmoqda...</div>
+                                </td>
+                            </tr>
+                        ) : filteredSales.map(sale => (
                             <tr key={sale.id}>
-                                <td style={{ fontWeight: 500 }}>{sale.customerName}</td>
                                 <td className="text-muted">{formatDate(sale.startDate)}</td>
+                                <td style={{ fontWeight: 500 }}>{sale.customerName}</td>
                                 <td className="text-muted">{sale.phoneNumber}</td>
                                 <td>{sale.note || '-'}</td>
-                                <td>${sale.totalPrice}</td>
-                                <td>${calculatePaidAmount(sale)}</td>
+                                <td>{formatPrice(sale.totalPrice, sale.currency)}</td>
+                                <td>{formatPrice(calculatePaidAmount(sale), sale.currency)}</td>
                                 <td>{getStatus(sale)}</td>
                                 <td style={{ display: 'flex', gap: '8px' }}>
                                     <button
@@ -120,7 +132,7 @@ const Sales = () => {
                         ))}
                         {filteredSales.length === 0 && (
                             <tr>
-                                <td colSpan={7} style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>
+                                <td colSpan={8} style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>
                                     Ma'lumot topilmadi
                                 </td>
                             </tr>

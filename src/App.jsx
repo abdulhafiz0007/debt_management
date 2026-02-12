@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { StoreProvider } from './context/StoreContext';
 import { useStore } from './context/StoreContext';
 import MainLayout from './layouts/MainLayout';
-import Dashboard from './pages/Dashboard';
 import Sales from './pages/Sales';
 import Login from './pages/Login';
 import { Navigate } from 'react-router-dom';
@@ -21,7 +20,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-            <Route index element={<Dashboard />} />
+            <Route index element={<Sales />} />
             <Route path="sales" element={<Sales />} />
           </Route>
         </Routes>

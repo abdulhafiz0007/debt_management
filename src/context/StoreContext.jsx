@@ -15,41 +15,61 @@ const StoreContext = createContext();
 export const useStore = () => useContext(StoreContext);
 
 export const StoreProvider = ({ children }) => {
-    // Load initial state from localStorage
-    const [sales, setSales] = useState(() => {
-        try {
-            const saved = localStorage.getItem('apple555_sales');
-            return saved ? JSON.parse(saved) : [];
-        } catch (e) {
-            console.error("Failed to load sales", e);
-            return [];
-        }
-    });
-
-    // Save to localStorage whenever sales change
-    useEffect(() => {
-        try {
-            localStorage.setItem('apple555_sales', JSON.stringify(sales));
-        } catch (e) {
-            console.error("Failed to save sales", e);
-        }
-    }, [sales]);
-
+    const [sales, setSales] = useState([]);
     const [token, setToken] = useState(localStorage.getItem('apple555_token') || null);
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    const API_URL = 'https://apple555-back-iqs8.onrender.com/api';
 
     // Update token in localStorage
     useEffect(() => {
         if (token) {
             localStorage.setItem('apple555_token', token);
+            fetchSales();
         } else {
             localStorage.removeItem('apple555_token');
+            setSales([]);
         }
     }, [token]);
 
+    const fetchSales = async () => {
+        if (!token) return;
+        setLoading(true);
+        try {
+            const response = await fetch(`${API_URL}/sales`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                // Map backend data to frontend structure
+                const mappedSales = (data.content || []).map(item => ({
+                    id: item.id,
+                    customerName: item.buyer,
+                    phoneNumber: item.buyerPhoneNumber,
+                    note: item.productName,
+                    totalPrice: item.fullPrice,
+                    downPayment: item.firstPayment,
+                    paidAmount: item.firstPayment, // Initial paidAmount is firstPayment
+                    currency: item.currency || 'USD',
+                    durationMonths: item.months,
+                    startDate: item.soldAt,
+                    isDone: item.isDone,
+                    comment: item.comment,
+                    appleId: item.connectedAppleId
+                }));
+                setSales(mappedSales);
+            }
+        } catch (error) {
+            console.error('Failed to fetch sales:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const login = async (username, password) => {
         try {
-            const response = await fetch('https://apple555-back-iqs8.onrender.com/api/auth/sign-in', {
+            const response = await fetch(`${API_URL}/auth/sign-in`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
@@ -78,25 +98,102 @@ export const StoreProvider = ({ children }) => {
         setUser(null);
     };
 
-    const addSale = (saleData) => {
-        const newSale = {
-            id: generateId(),
-            createdAt: new Date().toISOString(),
-            ...saleData, // { customerName, phoneNumber, note, totalPrice, durationMonths, startDate }
-            paidAmount: 0
-        };
-        setSales(prev => [...prev, newSale]);
+    const addSale = async (saleData) => {
+        try {
+            // Convert "2026-02-12" to ISO Instant format "2026-02-12T00:00:00Z"
+            const isoDate = saleData.startDate ? new Date(saleData.startDate).toISOString() : new Date().toISOString();
+
+            const body = {
+                buyer: saleData.customerName,
+                buyerPhoneNumber: saleData.phoneNumber,
+                productName: saleData.note || 'Telefon',
+                fullPrice: Number(saleData.totalPrice),
+                firstPayment: Number(saleData.downPayment),
+                currency: saleData.currency,
+                months: Number(saleData.durationMonths),
+                isDone: false,
+                connectedAppleId: saleData.appleId || '',
+                soldAt: isoDate,
+                comment: saleData.comment || ''
+            };
+
+            const response = await fetch(`${API_URL}/sales`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(body)
+            });
+
+            if (response.ok) {
+                fetchSales(); // Refresh list
+                return { success: true };
+            }
+            return { success: false };
+        } catch (error) {
+            console.error('Add sale error:', error);
+            return { success: false };
+        }
     };
 
-    const deleteSale = (id) => {
-        setSales(prev => prev.filter(s => s.id !== id));
+    const deleteSale = async (id) => {
+        try {
+            const response = await fetch(`${API_URL}/sales/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                setSales(prev => prev.filter(s => s.id !== id));
+                return true;
+            }
+        } catch (error) {
+            console.error('Delete sale error:', error);
+        }
+        return false;
     };
 
-    const updatePaidAmount = (saleId, amount) => {
-        setSales(prev => prev.map(sale => {
-            if (sale.id !== saleId) return sale;
-            return { ...sale, paidAmount: amount };
-        }));
+    const updateSale = async (id, updatedData) => {
+        try {
+            // Fetch the full original data or construct it
+            const original = sales.find(s => s.id === id);
+            if (!original) return false;
+
+            // Ensure date is in ISO Instant format if provided
+            const soldAt = updatedData.startDate ? new Date(updatedData.startDate).toISOString() : original.startDate;
+
+            const body = {
+                id: id,
+                buyer: updatedData.customerName || original.customerName,
+                buyerPhoneNumber: updatedData.phoneNumber || original.phoneNumber,
+                productName: updatedData.note || original.note,
+                fullPrice: Number(updatedData.totalPrice || original.totalPrice),
+                firstPayment: Number(updatedData.paidAmount || original.paidAmount), // Assuming firstPayment is used for total paid for now
+                currency: updatedData.currency || original.currency,
+                months: Number(updatedData.durationMonths || original.durationMonths),
+                isDone: updatedData.isDone !== undefined ? updatedData.isDone : original.isDone,
+                connectedAppleId: updatedData.appleId || original.appleId || '',
+                soldAt: soldAt,
+                comment: updatedData.comment || original.comment || ''
+            };
+
+            const response = await fetch(`${API_URL}/sales`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(body)
+            });
+
+            if (response.ok) {
+                fetchSales();
+                return true;
+            }
+        } catch (error) {
+            console.error('Update sale error:', error);
+        }
+        return false;
     };
 
     return (
@@ -104,12 +201,13 @@ export const StoreProvider = ({ children }) => {
             sales,
             addSale,
             deleteSale,
-            updatePaidAmount,
+            updateSale,
             token,
             isAuthenticated: !!token,
             user,
             login,
-            logout
+            logout,
+            loading
         }}>
             {children}
         </StoreContext.Provider>
