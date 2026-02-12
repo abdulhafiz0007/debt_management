@@ -1,26 +1,21 @@
 
 import React from 'react';
-import { Search, Bell, User } from 'lucide-react';
+import { Search, Bell, User, LogOut } from 'lucide-react';
+import { useStore } from '../context/StoreContext';
 
 const Header = ({ title }) => {
+    const { logout } = useStore();
+
     return (
         <header className="top-header">
             <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>{title}</h2>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                {/* <div style={{ position: 'relative' }}>
-                    <Search size={18} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                    <input
-                        type="text"
-                        placeholder="Qidirish..."
-                        className="input"
-                        style={{ paddingLeft: '36px', width: '250px' }}
-                    />
-                </div> */}
-
                 <button className="btn" style={{ padding: '8px', borderRadius: '50%', background: 'transparent', border: 'none', color: 'var(--text-secondary)' }}>
                     <Bell size={20} />
                 </button>
+
+                <div style={{ height: '24px', width: '1px', background: 'var(--border)' }}></div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#e0e7ff', color: '#4f46e5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
@@ -31,6 +26,25 @@ const Header = ({ title }) => {
                         <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Manager</span>
                     </div>
                 </div>
+
+                <button
+                    onClick={logout}
+                    className="btn"
+                    style={{
+                        padding: '8px',
+                        borderRadius: '8px',
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--danger)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        cursor: 'pointer'
+                    }}
+                    title="Chiqish"
+                >
+                    <LogOut size={20} />
+                </button>
             </div>
         </header>
     );

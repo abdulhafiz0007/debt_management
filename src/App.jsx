@@ -2,17 +2,25 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { StoreProvider } from './context/StoreContext';
+import { useStore } from './context/StoreContext';
 import MainLayout from './layouts/MainLayout';
 import Dashboard from './pages/Dashboard';
 import Sales from './pages/Sales';
-import Payments from './pages/Payments';
+import Login from './pages/Login';
+import { Navigate } from 'react-router-dom';
+
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated } = useStore();
+  return isAuthenticated ? children : <Navigate to="/login" />;
+};
 
 function App() {
   return (
     <StoreProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<MainLayout />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route index element={<Dashboard />} />
             <Route path="sales" element={<Sales />} />
           </Route>

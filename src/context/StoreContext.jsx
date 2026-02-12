@@ -35,6 +35,49 @@ export const StoreProvider = ({ children }) => {
         }
     }, [sales]);
 
+    const [token, setToken] = useState(localStorage.getItem('apple555_token') || null);
+    const [user, setUser] = useState(null);
+
+    // Update token in localStorage
+    useEffect(() => {
+        if (token) {
+            localStorage.setItem('apple555_token', token);
+        } else {
+            localStorage.removeItem('apple555_token');
+        }
+    }, [token]);
+
+    const login = async (username, password) => {
+        try {
+            const response = await fetch('https://apple555-back-iqs8.onrender.com/api/auth/sign-in', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Login muvaffaqiyatsiz bo\'ldi');
+            }
+
+            const data = await response.json();
+            if (data.accessToken) {
+                setToken(data.accessToken);
+                setUser({ username });
+                return { success: true };
+            }
+            return { success: false, message: 'Token topilmadi' };
+        } catch (error) {
+            console.error('Login error:', error);
+            return { success: false, message: error.message };
+        }
+    };
+
+    const logout = () => {
+        setToken(null);
+        setUser(null);
+    };
+
     const addSale = (saleData) => {
         const newSale = {
             id: generateId(),
@@ -52,21 +95,22 @@ export const StoreProvider = ({ children }) => {
     const updatePaidAmount = (saleId, amount) => {
         setSales(prev => prev.map(sale => {
             if (sale.id !== saleId) return sale;
-
-            // We are now just tracking total paid amount, but preserving the structure 
-            // incase we want to go back to schedule. 
-            // For now, let's just update the first payment entry to hold the entire paid amount mockingly 
-            // OR better: add a 'paidAmount' field to the SALE object itself.
-
-            // Let's go with adding 'paidAmount' to the sale object for simplicity and robustness 
-            // given the user's request to "manually enter how much paid".
-
             return { ...sale, paidAmount: amount };
         }));
     };
 
     return (
-        <StoreContext.Provider value={{ sales, addSale, deleteSale, updatePaidAmount }}>
+        <StoreContext.Provider value={{
+            sales,
+            addSale,
+            deleteSale,
+            updatePaidAmount,
+            token,
+            isAuthenticated: !!token,
+            user,
+            login,
+            logout
+        }}>
             {children}
         </StoreContext.Provider>
     );
