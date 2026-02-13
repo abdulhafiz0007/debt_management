@@ -49,12 +49,12 @@ const Sales = () => {
     return (
         <div>
             <div className="flex-between mb-4">
-                <div style={{ position: 'relative' }}>
+                <div style={{ position: 'relative', flex: 1, minWidth: '200px' }}>
                     <Search size={18} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
                     <input
                         className="input"
                         placeholder="Mijoz qidirish..."
-                        style={{ paddingLeft: '36px', width: '300px' }}
+                        style={{ paddingLeft: '36px', width: '80%' }}
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
                     />
@@ -78,67 +78,69 @@ const Sales = () => {
                 <EditSaleModal sale={editingSale} onClose={() => setEditingSale(null)} />
             )}
 
-            <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-                <table className="data-table">
-                    <thead>
-                        <tr>
-                            <th>Sana</th>
-                            <th>Mijoz</th>
-                            <th>Telefon</th>
-                            <th>Mahsulot</th>
-                            <th>Narx</th>
-                            <th>To'langan</th>
-                            <th>Holat</th>
-                            <th>Amallar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading && sales.length === 0 ? (
+            <div className="card" style={{ padding: 0 }}>
+                <div className="table-container">
+                    <table className="data-table">
+                        <thead>
                             <tr>
-                                <td colSpan={8} style={{ textAlign: 'center', padding: '32px' }}>
-                                    <div className="text-muted">Yuklanmoqda...</div>
-                                </td>
+                                <th>Sana</th>
+                                <th>Mijoz</th>
+                                <th>Telefon</th>
+                                <th>Mahsulot</th>
+                                <th>Narx</th>
+                                <th>To'langan</th>
+                                <th>Holat</th>
+                                <th>Amallar</th>
                             </tr>
-                        ) : filteredSales.map(sale => (
-                            <tr key={sale.id}>
-                                <td className="text-muted">{formatDate(sale.startDate)}</td>
-                                <td style={{ fontWeight: 500 }}>{sale.customerName}</td>
-                                <td className="text-muted">{sale.phoneNumber}</td>
-                                <td>{sale.note || '-'}</td>
-                                <td>{formatPrice(sale.totalPrice, sale.currency)}</td>
-                                <td>{formatPrice(calculatePaidAmount(sale), sale.currency)}</td>
-                                <td>{getStatus(sale)}</td>
-                                <td style={{ display: 'flex', gap: '8px' }}>
-                                    <button
-                                        className="btn btn-secondary"
-                                        style={{ padding: '6px', color: 'var(--primary)' }}
-                                        onClick={() => setEditingSale(sale)}
-                                        title="To'lovlarni boshqarish"
-                                    >
-                                        <Edit2 size={16} />
-                                    </button>
-                                    <button
-                                        className="btn btn-secondary"
-                                        style={{ color: '#ef4444', padding: '6px' }}
-                                        onClick={() => {
-                                            if (window.confirm("Rostdan ham o'chirmoqchimisiz?")) deleteSale(sale.id);
-                                        }}
-                                        title="O'chirish"
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                        {filteredSales.length === 0 && (
-                            <tr>
-                                <td colSpan={8} style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>
-                                    Ma'lumot topilmadi
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {loading && sales.length === 0 ? (
+                                <tr>
+                                    <td colSpan={8} style={{ textAlign: 'center', padding: '32px' }}>
+                                        <div className="text-muted">Yuklanmoqda...</div>
+                                    </td>
+                                </tr>
+                            ) : filteredSales.map(sale => (
+                                <tr key={sale.id}>
+                                    <td className="text-muted">{formatDate(sale.startDate)}</td>
+                                    <td style={{ fontWeight: 500 }}>{sale.customerName}</td>
+                                    <td className="text-muted">{sale.phoneNumber}</td>
+                                    <td>{sale.note || '-'}</td>
+                                    <td>{formatPrice(sale.totalPrice, sale.currency)}</td>
+                                    <td>{formatPrice(calculatePaidAmount(sale), sale.currency)}</td>
+                                    <td>{getStatus(sale)}</td>
+                                    <td style={{ display: 'flex', gap: '8px' }}>
+                                        <button
+                                            className="btn btn-secondary"
+                                            style={{ padding: '6px', color: 'var(--primary)' }}
+                                            onClick={() => setEditingSale(sale)}
+                                            title="To'lovlarni boshqarish"
+                                        >
+                                            <Edit2 size={16} />
+                                        </button>
+                                        <button
+                                            className="btn btn-secondary"
+                                            style={{ color: '#ef4444', padding: '6px' }}
+                                            onClick={() => {
+                                                if (window.confirm("Rostdan ham o'chirmoqchimisiz?")) deleteSale(sale.id);
+                                            }}
+                                            title="O'chirish"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                            {filteredSales.length === 0 && (
+                                <tr>
+                                    <td colSpan={8} style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>
+                                        Ma'lumot topilmadi
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

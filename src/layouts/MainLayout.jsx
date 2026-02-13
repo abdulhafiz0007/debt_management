@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import { Outlet, useLocation } from 'react-router-dom';
@@ -17,8 +17,8 @@ const MainLayout = () => {
     };
 
     return (
-        <div style={{ display: 'flex', width: '100%' }}>
-            <Sidebar />
+        <div style={{ display: 'flex', width: '100%', minHeight: '100vh' }}>
+            <Sidebar isOpen={false} onClose={() => { }} />
             <div className="main-content">
                 <Header title={getTitle()} />
                 <div className="page-content">
