@@ -113,11 +113,16 @@ body {
 /* Form Elements */
 .input {
   width: 100%;
+  min-width: 0;
   padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid var(--border);
   font-size: 0.95rem;
   transition: border-color 0.2s;
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 44px;
+  box-sizing: border-box;
 }
 
 .input:focus {

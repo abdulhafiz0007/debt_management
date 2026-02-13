@@ -109,7 +109,7 @@ const AddSaleForm = ({ onSuccess }) => {
 
             <div className="responsive-grid mb-4">
                 <div>
-                    <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Birinchi To'lov (Down Payment)</label>
+                    <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Birinchi To'lov </label>
                     <input
                         className="input"
                         name="downPayment"
