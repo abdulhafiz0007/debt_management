@@ -37,7 +37,14 @@ const EditSaleModal = ({ sale, onClose }) => {
             zIndex: 1000,
             backdropFilter: 'blur(5px)'
         }}>
-            <div className="card" style={{ width: '450px', animation: 'fadeIn 0.3s' }}>
+            <div className="card" style={{
+                width: '95%',
+                maxWidth: '450px',
+                padding: 'min(24px, 5%)',
+                animation: 'fadeIn 0.3s',
+                maxHeight: '90vh',
+                overflowY: 'auto'
+            }}>
                 <div className="flex-between mb-4" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '16px' }}>
                     <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>To'lovni Tahrirlash</h3>
                     <button onClick={onClose} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
@@ -65,7 +72,7 @@ const EditSaleModal = ({ sale, onClose }) => {
                             <input
                                 type="number"
                                 className="input"
-                                style={{ paddingLeft: '32px', fontSize: '1.2rem', fontWeight: 'bold' }}
+                                style={{ paddingLeft: '42px', fontSize: '1.2rem', fontWeight: 'bold' }}
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
                                 autoFocus

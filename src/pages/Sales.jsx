@@ -109,25 +109,27 @@ const Sales = () => {
                                     <td>{formatPrice(sale.totalPrice, sale.currency)}</td>
                                     <td>{formatPrice(calculatePaidAmount(sale), sale.currency)}</td>
                                     <td>{getStatus(sale)}</td>
-                                    <td style={{ display: 'flex', gap: '8px' }}>
-                                        <button
-                                            className="btn btn-secondary"
-                                            style={{ padding: '6px', color: 'var(--primary)' }}
-                                            onClick={() => setEditingSale(sale)}
-                                            title="To'lovlarni boshqarish"
-                                        >
-                                            <Edit2 size={16} />
-                                        </button>
-                                        <button
-                                            className="btn btn-secondary"
-                                            style={{ color: '#ef4444', padding: '6px' }}
-                                            onClick={() => {
-                                                if (window.confirm("Rostdan ham o'chirmoqchimisiz?")) deleteSale(sale.id);
-                                            }}
-                                            title="O'chirish"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
+                                    <td>
+                                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                            <button
+                                                className="btn btn-secondary"
+                                                style={{ padding: '6px', color: 'var(--primary)', }}
+                                                onClick={() => setEditingSale(sale)}
+                                                title="To'lovlarni boshqarish"
+                                            >
+                                                <Edit2 size={16} />
+                                            </button>
+                                            <button
+                                                className="btn btn-secondary"
+                                                style={{ color: '#ef4444', padding: '6px', }}
+                                                onClick={() => {
+                                                    if (window.confirm("Rostdan ham o'chirmoqchimisiz?")) deleteSale(sale.id);
+                                                }}
+                                                title="O'chirish"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

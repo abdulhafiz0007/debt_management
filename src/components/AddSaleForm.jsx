@@ -55,7 +55,7 @@ const AddSaleForm = ({ onSuccess }) => {
 
     return (
         <form onSubmit={handleSubmit}>
-            <div className="grid-cols-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+            <div className="responsive-grid mb-4">
                 <div>
                     <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Mijoz F.I.O</label>
                     <input
@@ -79,7 +79,7 @@ const AddSaleForm = ({ onSuccess }) => {
                 </div>
             </div>
 
-            <div className="grid-cols-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+            <div className="responsive-grid mb-4">
                 <div>
                     <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Valyuta</label>
                     <select
@@ -107,7 +107,7 @@ const AddSaleForm = ({ onSuccess }) => {
                 </div>
             </div>
 
-            <div className="grid-cols-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+            <div className="responsive-grid mb-4">
                 <div>
                     <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Birinchi To'lov (Down Payment)</label>
                     <input
@@ -133,7 +133,7 @@ const AddSaleForm = ({ onSuccess }) => {
                 </div>
             </div>
 
-            <div className="grid-cols-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+            <div className="responsive-grid mb-4">
                 <div>
                     <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Boshlanish Sanasi</label>
                     <input
@@ -157,7 +157,7 @@ const AddSaleForm = ({ onSuccess }) => {
                 </div>
             </div>
 
-            <div className="grid-cols-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+            <div className="responsive-grid mb-4">
                 <div>
                     <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Apple ID</label>
                     <input

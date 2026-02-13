@@ -37,7 +37,12 @@ const Login = () => {
             background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
             fontFamily: "'Plus Jakarta Sans', sans-serif"
         }}>
-            <div className="card" style={{ width: '400px', padding: '40px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+            <div className="card" style={{
+                width: '90%',
+                maxWidth: '400px',
+                padding: 'min(40px, 8%)',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+            }}>
                 <div style={{ textAlign: 'center', marginBottom: '32px' }}>
                     <div style={{
                         width: '64px',
