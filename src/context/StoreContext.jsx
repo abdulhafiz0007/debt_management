@@ -12,7 +12,8 @@ export const StoreProvider = ({children}) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const API_URL = 'https://back.apple555.uz/api';
+    // const API_URL = 'https://back.apple555.uz/api';
+    const API_URL = 'http://localhost:8889/api';
 
     // Update token in localStorage
     useEffect(() => {
@@ -92,6 +93,13 @@ export const StoreProvider = ({children}) => {
     };
 
     const addSale = async (saleData) => {
+        console.log('addSale called with saleData:', saleData);
+
+        if (!token) {
+            console.error('No token available');
+            return {success: false, message: 'Authentication required'};
+        }
+
         try {
             const body = {
                 buyer: saleData.buyer,
@@ -111,7 +119,9 @@ export const StoreProvider = ({children}) => {
                 comment: saleData.comment || ''
             };
 
-            console.log('Adding sale with data:', body);
+            console.log('Request body:', JSON.stringify(body, null, 2));
+            console.log('Token:', token);
+            console.log('API URL:', `${API_URL}/sales`);
 
             const response = await fetch(`${API_URL}/sales`, {
                 method: 'POST',
@@ -122,18 +132,39 @@ export const StoreProvider = ({children}) => {
                 body: JSON.stringify(body)
             });
 
+            console.log('Response received:', {
+                status: response.status,
+                statusText: response.statusText,
+                ok: response.ok
+            });
+
+            const responseText = await response.text();
+            console.log('Response text:', responseText);
+
             if (response.ok) {
-                const result = await response.json();
-                console.log('Sale added successfully:', result);
-                fetchSales(); // Refresh list
+                try {
+                    const result = JSON.parse(responseText);
+                    console.log('Sale added successfully:', result);
+                } catch (e) {
+                    console.log('Response was not JSON, but status was ok');
+                }
+                await fetchSales(); // Refresh list
                 return {success: true};
             } else {
-                const errorData = await response.json();
-                console.error('Add sale error response:', errorData);
-                return {success: false, message: errorData.message || 'Failed to add sale'};
+                let errorData = {message: 'Unknown error'};
+                try {
+                    errorData = JSON.parse(responseText);
+                    console.error('Error response JSON:', errorData);
+                } catch (e) {
+                    console.error('Could not parse error response, using status text');
+                    errorData = {message: response.statusText};
+                }
+                const message = errorData.message || errorData.error || 'Failed to add sale';
+                console.error('Add sale error:', message);
+                return {success: false, message};
             }
         } catch (error) {
-            console.error('Add sale error:', error);
+            console.error('Add sale exception:', error);
             return {success: false, message: error.message};
         }
     };

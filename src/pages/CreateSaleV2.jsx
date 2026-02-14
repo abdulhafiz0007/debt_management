@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { useStore } from '../context/StoreContext';
-import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, {useState} from 'react';
+import {useStore} from '../context/StoreContext';
+import {ArrowLeft} from 'lucide-react';
+import {useNavigate} from 'react-router-dom';
 
 const CreateSaleV2 = () => {
-    const { addSale } = useStore();
+    const {addSale} = useStore();
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
@@ -13,12 +13,12 @@ const CreateSaleV2 = () => {
         buyerPhoneNumber: '+99893939852003',
         productName: 'IPhone 15 Pro Max',
         currency: 'USD',
-        realPrice: '1000',
-        percentage: '10',
-        finalPrice: '1100',
-        firstPayment: '500',
-        months: '6',
-        monthlyPaymentAmount: '100',
+        realPrice: 1000,
+        percentage: 10,
+        finalPrice: 1100,
+        firstPayment: 500,
+        months: 6,
+        monthlyPaymentAmount: 100,
         isDone: false,
         connectedAppleId: 'javer@icloud.com',
         comment: 'Some comment here...'
@@ -26,52 +26,89 @@ const CreateSaleV2 = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.buyer || !formData.productName || !formData.currency || !formData.realPrice || !formData.percentage || !formData.finalPrice || !formData.firstPayment || !formData.months || !formData.monthlyPaymentAmount || formData.isDone === null) return;
+
+        console.log('Form submitted, formData:', formData);
+
+        // Simple validation - just check if fields have values
+        const errors = [];
+
+        if (!formData.buyer?.trim()) errors.push('Xaridor F.I.O');
+        if (!formData.productName?.trim()) errors.push('Mahsulot Nomi');
+        if (!formData.currency) errors.push('Valyuta');
+        if (!formData.realPrice && formData.realPrice !== 0) errors.push('Haqiqiy Narx');
+        if (!formData.percentage && formData.percentage !== '0' && formData.percentage !== 0) errors.push('Foiz');
+        if (!formData.finalPrice && formData.finalPrice !== 0) errors.push('Yakuniy Narx');
+        if (!formData.firstPayment && formData.firstPayment !== '0' && formData.firstPayment !== 0) errors.push('Birinchi To\'lov');
+        if (!formData.months && formData.months !== 0) errors.push('Muddat');
+        if (!formData.monthlyPaymentAmount && formData.monthlyPaymentAmount !== '0' && formData.monthlyPaymentAmount !== 0) errors.push('Oylik To\'lov Miqdori');
+
+        if (errors.length > 0) {
+            alert(`Ushbu maydonlar majburiy: ${errors.join(', ')}`);
+            console.log('Validation failed:', errors);
+            return;
+        }
+
+        console.log('Validation passed, preparing to submit');
 
         setIsSubmitting(true);
-        const result = await addSale({
-            buyer: formData.buyer,
-            buyerPassport: formData.buyerPassport,
-            buyerPhoneNumber: formData.buyerPhoneNumber,
-            productName: formData.productName,
-            currency: formData.currency,
-            realPrice: Number(formData.realPrice),
-            percentage: Number(formData.percentage),
-            finalPrice: Number(formData.finalPrice),
-            firstPayment: Number(formData.firstPayment),
-            months: Number(formData.months),
-            monthlyPaymentAmount: Number(formData.monthlyPaymentAmount),
-            isDone: formData.isDone,
-            connectedAppleId: formData.connectedAppleId,
-            comment: formData.comment,
-            soldAt: new Date().toISOString()
-        });
 
-        setIsSubmitting(false);
+        try {
+            const salePayload = {
+                buyer: formData.buyer?.trim(),
+                buyerPassport: (formData.buyerPassport || '').trim(),
+                buyerPhoneNumber: (formData.buyerPhoneNumber || '').trim(),
+                productName: formData.productName?.trim(),
+                currency: formData.currency,
+                realPrice: Number(formData.realPrice),
+                percentage: Number(formData.percentage),
+                finalPrice: Number(formData.finalPrice),
+                firstPayment: Number(formData.firstPayment),
+                months: Number(formData.months),
+                monthlyPaymentAmount: Number(formData.monthlyPaymentAmount),
+                isDone: formData.isDone,
+                connectedAppleId: (formData.connectedAppleId || '').trim(),
+                comment: (formData.comment || '').trim(),
+                soldAt: new Date().toISOString()
+            };
 
-        if (result.success) {
-            alert("Sotuv muvaffaqiyatli qo'shildi!");
-            navigate('/sales');
-        } else {
-            alert("Xatolik yuz berdi. Iltimos qaytadan urinib ko'ring.");
+            console.log('Calling addSale with payload:', salePayload);
+
+            const result = await addSale(salePayload);
+
+            console.log('addSale returned:', result);
+
+            setIsSubmitting(false);
+
+            if (result?.success) {
+                alert("Sotuv muvaffaqiyatli qo'shildi!");
+                navigate('/sales');
+            } else {
+                const errorMsg = result?.message || 'Xatolik yuz berdi. Iltimos qaytadan urinib ko\'ring.';
+                console.error('Submit failed:', errorMsg);
+                alert(errorMsg);
+            }
+        } catch (error) {
+            console.error('Unexpected error in handleSubmit:', error);
+            setIsSubmitting(false);
+            alert(`Kutilmagan xatolik: ${error.message}`);
         }
     };
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setFormData({...formData, [e.target.name]: e.target.value});
     };
 
     return (
-        <div style={{ maxWidth: '800px' }}>
+        <div style={{maxWidth: '800px'}}>
             <div className="flex-between mb-6">
-                <h1 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <h1 style={{margin: 0, display: 'flex', alignItems: 'center', gap: '12px'}}>
                     <button
                         className="btn btn-secondary"
                         onClick={() => navigate('/sales')}
-                        style={{ padding: '6px', display: 'flex', alignItems: 'center' }}
+                        style={{padding: '6px', display: 'flex', alignItems: 'center'}}
                         title="Orqaga"
                     >
-                        <ArrowLeft size={20} />
+                        <ArrowLeft size={20}/>
                     </button>
                     Yangi Sotuv
                 </h1>
@@ -82,7 +119,8 @@ const CreateSaleV2 = () => {
                     {/* Buyer Section */}
                     <div className="responsive-grid mb-4">
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Xaridor F.I.O *</label>
+                            <label className="text-sm text-muted" style={{display: 'block', marginBottom: '4px'}}>Xaridor
+                                F.I.O *</label>
                             <input
                                 className="input"
                                 name="buyer"
@@ -93,7 +131,8 @@ const CreateSaleV2 = () => {
                             />
                         </div>
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Pasport Raqami</label>
+                            <label className="text-sm text-muted" style={{display: 'block', marginBottom: '4px'}}>Pasport
+                                Raqami</label>
                             <input
                                 className="input"
                                 name="buyerPassport"
@@ -106,7 +145,8 @@ const CreateSaleV2 = () => {
 
                     <div className="responsive-grid mb-4">
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Telefon Raqam</label>
+                            <label className="text-sm text-muted" style={{display: 'block', marginBottom: '4px'}}>Telefon
+                                Raqam</label>
                             <input
                                 className="input"
                                 name="buyerPhoneNumber"
@@ -120,8 +160,9 @@ const CreateSaleV2 = () => {
 
                     {/* Product Section */}
                     <div className="responsive-grid mb-4">
-                        <div style={{ gridColumn: '1 / -1' }}>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Mahsulot Nomi *</label>
+                        <div style={{gridColumn: '1 / -1'}}>
+                            <label className="text-sm text-muted" style={{display: 'block', marginBottom: '4px'}}>Mahsulot
+                                Nomi *</label>
                             <input
                                 className="input"
                                 name="productName"
@@ -136,13 +177,14 @@ const CreateSaleV2 = () => {
                     {/* Currency and Pricing */}
                     <div className="responsive-grid mb-4">
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Valyuta *</label>
+                            <label className="text-sm text-muted" style={{display: 'block', marginBottom: '4px'}}>Valyuta
+                                *</label>
                             <select
                                 className="input"
                                 name="currency"
                                 value={formData.currency}
                                 onChange={handleChange}
-                                style={{ width: '100%' }}
+                                style={{width: '100%'}}
                                 required
                             >
                                 <option value="USD">USD ($)</option>
@@ -150,7 +192,8 @@ const CreateSaleV2 = () => {
                             </select>
                         </div>
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Haqiqiy Narx *</label>
+                            <label className="text-sm text-muted" style={{display: 'block', marginBottom: '4px'}}>Haqiqiy
+                                Narx *</label>
                             <input
                                 className="input"
                                 name="realPrice"
@@ -166,7 +209,8 @@ const CreateSaleV2 = () => {
                     {/* Percentage and Prices */}
                     <div className="responsive-grid mb-4">
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Foiz (%) *</label>
+                            <label className="text-sm text-muted" style={{display: 'block', marginBottom: '4px'}}>Foiz
+                                (%) *</label>
                             <input
                                 className="input"
                                 name="percentage"
@@ -178,7 +222,8 @@ const CreateSaleV2 = () => {
                             />
                         </div>
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Yakuniy Narx *</label>
+                            <label className="text-sm text-muted" style={{display: 'block', marginBottom: '4px'}}>Yakuniy
+                                Narx *</label>
                             <input
                                 className="input"
                                 name="finalPrice"
@@ -194,7 +239,8 @@ const CreateSaleV2 = () => {
                     {/* Payment Info */}
                     <div className="responsive-grid mb-4">
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Birinchi To'lov *</label>
+                            <label className="text-sm text-muted" style={{display: 'block', marginBottom: '4px'}}>Birinchi
+                                To'lov *</label>
                             <input
                                 className="input"
                                 name="firstPayment"
@@ -206,7 +252,8 @@ const CreateSaleV2 = () => {
                             />
                         </div>
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Muddat (oy) *</label>
+                            <label className="text-sm text-muted" style={{display: 'block', marginBottom: '4px'}}>Muddat
+                                (oy) *</label>
                             <input
                                 className="input"
                                 name="months"
@@ -222,7 +269,8 @@ const CreateSaleV2 = () => {
                     {/* Monthly Payment */}
                     <div className="responsive-grid mb-4">
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Oylik To'lov Miqdori *</label>
+                            <label className="text-sm text-muted" style={{display: 'block', marginBottom: '4px'}}>Oylik
+                                To'lov Miqdori *</label>
                             <input
                                 className="input"
                                 name="monthlyPaymentAmount"
@@ -234,13 +282,14 @@ const CreateSaleV2 = () => {
                             />
                         </div>
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Tugallangan? *</label>
+                            <label className="text-sm text-muted" style={{display: 'block', marginBottom: '4px'}}>Tugallangan?
+                                *</label>
                             <select
                                 className="input"
                                 name="isDone"
                                 value={formData.isDone}
-                                onChange={(e) => setFormData({ ...formData, isDone: e.target.value === 'true' })}
-                                style={{ width: '100%' }}
+                                onChange={(e) => setFormData({...formData, isDone: e.target.value === 'true'})}
+                                style={{width: '100%'}}
                                 required
                             >
                                 <option value="false">Yo'q</option>
@@ -252,7 +301,8 @@ const CreateSaleV2 = () => {
                     {/* Additional Information */}
                     <div className="responsive-grid mb-4">
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Apple ID</label>
+                            <label className="text-sm text-muted" style={{display: 'block', marginBottom: '4px'}}>Apple
+                                ID</label>
                             <input
                                 className="input"
                                 name="connectedAppleId"
@@ -266,20 +316,21 @@ const CreateSaleV2 = () => {
 
                     {/* Comment */}
                     <div className="responsive-grid mb-4">
-                        <div style={{ gridColumn: '1 / -1' }}>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Izoh</label>
+                        <div style={{gridColumn: '1 / -1'}}>
+                            <label className="text-sm text-muted"
+                                   style={{display: 'block', marginBottom: '4px'}}>Izoh</label>
                             <textarea
                                 className="input"
                                 name="comment"
                                 placeholder="Qo'shimcha ma'lumotlar..."
                                 value={formData.comment}
                                 onChange={handleChange}
-                                style={{ minHeight: '100px', resize: 'vertical' }}
+                                style={{minHeight: '100px', resize: 'vertical'}}
                             />
                         </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                    <div style={{display: 'flex', gap: '12px', justifyContent: 'flex-end'}}>
                         <button
                             type="button"
                             className="btn btn-secondary"
