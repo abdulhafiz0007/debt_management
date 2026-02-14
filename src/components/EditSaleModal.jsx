@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useStore } from '../context/StoreContext';
-import { X, DollarSign, Save } from 'lucide-react';
+import React, {useEffect, useState} from 'react';
+import {useStore} from '../context/StoreContext';
+import {Save, X} from 'lucide-react';
 
-const EditSaleModal = ({ sale: propSale, onClose }) => {
+const EditSaleModal = ({sale: propSale, onClose}) => {
     // CRITICAL FIX: Use live data from store, not the stale prop
     // This ensures that when fetchSales() runs, this component re-renders with new data
-    const { sales, updateSale, updateMonthlyPayment, generateMonthlyPayments, fetchSales, fetchSaleById } = useStore();
+    const {sales, updateMonthlyPayment, generateMonthlyPayments, fetchSaleById} = useStore();
 
     // Find live sale from store first (optimistic), but we will also fetch fresh data
     const sale = sales.find(s => s.id === propSale.id) || propSale;
@@ -28,7 +28,9 @@ const EditSaleModal = ({ sale: propSale, onClose }) => {
             }
         };
         loadData();
-        return () => { mounted = false; };
+        return () => {
+            mounted = false;
+        };
     }, [propSale.id]);
 
     // Initialize and Auto-Generate Schedule
@@ -229,33 +231,40 @@ const EditSaleModal = ({ sale: propSale, onClose }) => {
                         alignItems: 'center',
                         borderRadius: '12px'
                     }}>
-                        <div className="text-primary mb-2" style={{ fontWeight: 'bold' }}>
+                        <div className="text-primary mb-2" style={{fontWeight: 'bold'}}>
                             {isFetching ? "Ma'lumotlar yuklanmoqda..." : (isGenerating ? "Jadval yaratilmoqda..." : "Saqlanmoqda...")}
                         </div>
                         <div className="text-muted text-sm">Iltimos kuting</div>
                     </div>
                 )}
 
-                <div className="flex-between mb-4" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '16px' }}>
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>To'lovlar va Grafik</h3>
-                    <button onClick={onClose} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }} disabled={isUpdating || isGenerating}>
-                        <X size={24} color="var(--text-muted)" />
+                <div className="flex-between mb-4"
+                     style={{borderBottom: '1px solid var(--border)', paddingBottom: '16px'}}>
+                    <h3 style={{fontSize: '1.25rem', fontWeight: 'bold'}}>To'lovlar va Grafik</h3>
+                    <button onClick={onClose} style={{background: 'transparent', border: 'none', cursor: 'pointer'}}
+                            disabled={isUpdating || isGenerating}>
+                        <X size={24} color="var(--text-muted)"/>
                     </button>
                 </div>
 
                 <div className="mb-4">
-                    <p className="text-muted text-sm" style={{ marginBottom: '4px' }}>Mijoz</p>
-                    <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{sale.customerName}</div>
+                    <p className="text-muted text-sm" style={{marginBottom: '4px'}}>Mijoz</p>
+                    <div style={{fontWeight: 'bold', fontSize: '1.1rem'}}>{sale.customerName}</div>
                 </div>
 
-                <div className="mb-6" style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                <div className="mb-6" style={{
+                    background: '#f8fafc',
+                    padding: '16px',
+                    borderRadius: '12px',
+                    border: '1px solid var(--border)'
+                }}>
                     <div className="flex-between mb-4">
                         <span className="text-muted">Umumiy Qarz:</span>
-                        <span style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{formatPrice(sale.totalPrice)}</span>
+                        <span style={{fontWeight: 'bold', fontSize: '1.1rem'}}>{formatPrice(sale.totalPrice)}</span>
                     </div>
 
-                    <div style={{ marginBottom: '16px' }}>
-                        <label className="text-sm" style={{ display: 'block', marginBottom: '4px', fontWeight: '500' }}>
+                    <div style={{marginBottom: '16px'}}>
+                        <label className="text-sm" style={{display: 'block', marginBottom: '4px', fontWeight: '500'}}>
                             Jami To'langan ({sale.currency})
                         </label>
                         <div style={{
@@ -271,24 +280,32 @@ const EditSaleModal = ({ sale: propSale, onClose }) => {
                     <div>
                         <div className="flex-between text-sm mb-2">
                             <span>To'lov Jarayoni: {percentage}%</span>
-                            <span style={{ fontWeight: '600', color: percentage >= 100 ? 'var(--success)' : 'var(--primary)' }}>
+                            <span style={{
+                                fontWeight: '600',
+                                color: percentage >= 100 ? 'var(--success)' : 'var(--primary)'
+                            }}>
                                 {percentage >= 100 ? "To'liq to'landi" : `${formatPrice(sale.totalPrice - amount)} qoldi`}
                             </span>
                         </div>
-                        <div style={{ height: '10px', background: '#e2e8f0', borderRadius: '5px', overflow: 'hidden' }}>
+                        <div style={{height: '10px', background: '#e2e8f0', borderRadius: '5px', overflow: 'hidden'}}>
                             <div style={{
                                 height: '100%',
                                 width: `${percentage}%`,
                                 background: percentage >= 100 ? 'var(--success)' : 'var(--primary)',
                                 transition: 'width 0.4s ease'
-                            }} />
+                            }}/>
                         </div>
                     </div>
                 </div>
 
                 <div className="mb-6">
-                    <h4 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '12px', color: 'var(--text-primary)' }}>To'lovlar Jadvali</h4>
-                    <div style={{ display: 'grid', gap: '8px' }}>
+                    <h4 style={{
+                        fontSize: '1rem',
+                        fontWeight: 'bold',
+                        marginBottom: '12px',
+                        color: 'var(--text-primary)'
+                    }}>To'lovlar Jadvali</h4>
+                    <div style={{display: 'grid', gap: '8px'}}>
                         {localPayments.map((payment, index) => (
                             <div
                                 key={payment.id}
@@ -301,20 +318,22 @@ const EditSaleModal = ({ sale: propSale, onClose }) => {
                                     opacity: isUpdating ? 0.6 : 1
                                 }}
                             >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                                    <div style={{ flex: 1 }}>
-                                        <div style={{ fontWeight: '500', fontSize: '0.95rem' }}>{index + 1}-oy to'lovi</div>
-                                        <div className="text-muted text-xs">{formatDateShort(payment.expectedDate)}</div>
+                                <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px'}}>
+                                    <div style={{flex: 1}}>
+                                        <div style={{fontWeight: '500', fontSize: '0.95rem'}}>{index + 1}-oy to'lovi
+                                        </div>
+                                        <div
+                                            className="text-muted text-xs">{formatDateShort(payment.expectedDate)}</div>
                                     </div>
-                                    <div style={{ textAlign: 'right' }}>
+                                    <div style={{textAlign: 'right'}}>
                                         <div className="text-muted text-xs">Kutilgan:</div>
-                                        <div style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>
+                                        <div style={{fontWeight: 'bold', fontSize: '0.9rem'}}>
                                             {formatPrice(payment.expectedAmount)}
                                         </div>
                                     </div>
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <label className="text-sm" style={{ minWidth: '80px' }}>To'langan:</label>
+                                <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                                    <label className="text-sm" style={{minWidth: '80px'}}>To'langan:</label>
                                     <input
                                         type="number"
                                         className="input"
@@ -328,7 +347,7 @@ const EditSaleModal = ({ sale: propSale, onClose }) => {
                                             border: (payment.customAmount || payment.paidAmount) !== payment.expectedAmount ? '2px solid #4f46e5' : '1px solid var(--border)'
                                         }}
                                     />
-                                    <span className="text-sm" style={{ minWidth: '60px' }}>
+                                    <span className="text-sm" style={{minWidth: '60px'}}>
                                         {sale.currency === 'UZS' ? "so'm" : '$'}
                                     </span>
                                     <input
@@ -337,23 +356,26 @@ const EditSaleModal = ({ sale: propSale, onClose }) => {
                                         onChange={() => handleTogglePayment(payment.id)}
                                         disabled={isUpdating}
                                         title="To'langanini tasdiqlash"
-                                        style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+                                        style={{width: '20px', height: '20px', cursor: 'pointer'}}
                                     />
                                 </div>
                             </div>
                         ))}
                         {localPayments.length === 0 && (
-                            <div className="text-muted text-sm" style={{ textAlign: 'center', padding: '16px' }}>
+                            <div className="text-muted text-sm" style={{textAlign: 'center', padding: '16px'}}>
                                 {isGenerating ? "Jadval shakllantirilmoqda..." : "Jadval yuklanmoqda..."}
                             </div>
                         )}
                     </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-                    <button className="btn btn-secondary" style={{ flex: 1 }} onClick={onClose} disabled={isUpdating || isGenerating}>Bekor qilish</button>
-                    <button className="btn btn-primary" style={{ flex: 1 }} onClick={handleSave} disabled={isUpdating || isGenerating || localPayments.length === 0}>
-                        <Save size={18} /> Saqlash
+                <div style={{display: 'flex', gap: '12px', marginTop: '12px'}}>
+                    <button className="btn btn-secondary" style={{flex: 1}} onClick={onClose}
+                            disabled={isUpdating || isGenerating}>Bekor qilish
+                    </button>
+                    <button className="btn btn-primary" style={{flex: 1}} onClick={handleSave}
+                            disabled={isUpdating || isGenerating || localPayments.length === 0}>
+                        <Save size={18}/> Saqlash
                     </button>
                 </div>
             </div>
