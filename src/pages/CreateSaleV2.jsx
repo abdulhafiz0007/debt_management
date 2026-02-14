@@ -8,20 +8,20 @@ const CreateSaleV2 = () => {
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
-        buyer: '',
-        buyerPassport: '',
-        buyerPhoneNumber: '',
-        productName: '',
+        buyer: 'Muhammadqodir Muhsinov',
+        buyerPassport: 'AC2560295',
+        buyerPhoneNumber: '+99893939852003',
+        productName: 'IPhone 15 Pro Max',
         currency: 'USD',
-        realPrice: '',
-        percentage: '',
-        finalPrice: '',
-        firstPayment: '',
-        months: '',
-        monthlyPaymentAmount: '',
+        realPrice: '1000',
+        percentage: '10',
+        finalPrice: '1100',
+        firstPayment: '500',
+        months: '6',
+        monthlyPaymentAmount: '100',
         isDone: false,
-        connectedAppleId: '',
-        comment: ''
+        connectedAppleId: 'javer@icloud.com',
+        comment: 'Some comment here...'
     });
 
     const handleSubmit = async (e) => {

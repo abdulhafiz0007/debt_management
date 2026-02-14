@@ -93,22 +93,25 @@ export const StoreProvider = ({children}) => {
 
     const addSale = async (saleData) => {
         try {
-            // Convert "2026-02-12" to ISO Instant format "2026-02-12T00:00:00Z"
-            const isoDate = saleData.startDate ? new Date(saleData.startDate).toISOString() : new Date().toISOString();
-
             const body = {
-                buyer: saleData.customerName,
-                buyerPhoneNumber: saleData.phoneNumber,
-                productName: saleData.note || 'Telefon',
-                fullPrice: Number(saleData.totalPrice),
-                firstPayment: Number(saleData.downPayment),
+                buyer: saleData.buyer,
+                buyerPassport: saleData.buyerPassport || '',
+                buyerPhoneNumber: saleData.buyerPhoneNumber || '',
+                productName: saleData.productName,
                 currency: saleData.currency,
-                months: Number(saleData.durationMonths),
-                isDone: false,
-                connectedAppleId: saleData.appleId || '',
-                soldAt: isoDate,
+                realPrice: Number(saleData.realPrice) || 0,
+                percentage: Number(saleData.percentage) || 0,
+                finalPrice: Number(saleData.finalPrice),
+                firstPayment: Number(saleData.firstPayment) || 0,
+                months: Number(saleData.months) || 0,
+                monthlyPaymentAmount: Number(saleData.monthlyPaymentAmount) || 0,
+                isDone: saleData.isDone || false,
+                connectedAppleId: saleData.connectedAppleId || '',
+                soldAt: saleData.soldAt,
                 comment: saleData.comment || ''
             };
+
+            console.log('Adding sale with data:', body);
 
             const response = await fetch(`${API_URL}/sales`, {
                 method: 'POST',
@@ -120,13 +123,18 @@ export const StoreProvider = ({children}) => {
             });
 
             if (response.ok) {
+                const result = await response.json();
+                console.log('Sale added successfully:', result);
                 fetchSales(); // Refresh list
                 return {success: true};
+            } else {
+                const errorData = await response.json();
+                console.error('Add sale error response:', errorData);
+                return {success: false, message: errorData.message || 'Failed to add sale'};
             }
-            return {success: false};
         } catch (error) {
             console.error('Add sale error:', error);
-            return {success: false};
+            return {success: false, message: error.message};
         }
     };
 
