@@ -9,6 +9,8 @@ const CreateSaleV2 = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         buyer: '',
+        buyerPassport: '',
+        buyerPhoneNumber: '',
         productName: '',
         currency: 'USD',
         realPrice: '',
@@ -18,25 +20,29 @@ const CreateSaleV2 = () => {
         months: '',
         monthlyPaymentAmount: '',
         isDone: false,
+        connectedAppleId: '',
         comment: ''
     });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.buyer || !formData.productName || !formData.finalPrice) return;
+        if (!formData.buyer || !formData.productName || !formData.currency || !formData.realPrice || !formData.percentage || !formData.finalPrice || !formData.firstPayment || !formData.months || !formData.monthlyPaymentAmount || formData.isDone === null) return;
 
         setIsSubmitting(true);
         const result = await addSale({
             buyer: formData.buyer,
+            buyerPassport: formData.buyerPassport,
+            buyerPhoneNumber: formData.buyerPhoneNumber,
             productName: formData.productName,
             currency: formData.currency,
-            realPrice: Number(formData.realPrice) || 0,
-            percentage: Number(formData.percentage) || 0,
+            realPrice: Number(formData.realPrice),
+            percentage: Number(formData.percentage),
             finalPrice: Number(formData.finalPrice),
-            firstPayment: Number(formData.firstPayment) || 0,
-            months: Number(formData.months) || 0,
-            monthlyPaymentAmount: Number(formData.monthlyPaymentAmount) || 0,
+            firstPayment: Number(formData.firstPayment),
+            months: Number(formData.months),
+            monthlyPaymentAmount: Number(formData.monthlyPaymentAmount),
             isDone: formData.isDone,
+            connectedAppleId: formData.connectedAppleId,
             comment: formData.comment,
             soldAt: new Date().toISOString()
         });
@@ -86,6 +92,29 @@ const CreateSaleV2 = () => {
                                 required
                             />
                         </div>
+                        <div>
+                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Pasport Raqami</label>
+                            <input
+                                className="input"
+                                name="buyerPassport"
+                                placeholder="AA1234567"
+                                value={formData.buyerPassport}
+                                onChange={handleChange}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="responsive-grid mb-4">
+                        <div>
+                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Telefon Raqam</label>
+                            <input
+                                className="input"
+                                name="buyerPhoneNumber"
+                                placeholder="+998 90 123 45 67"
+                                value={formData.buyerPhoneNumber}
+                                onChange={handleChange}
+                            />
+                        </div>
                         <div></div>
                     </div>
 
@@ -121,7 +150,7 @@ const CreateSaleV2 = () => {
                             </select>
                         </div>
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Haqiqiy Narx</label>
+                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Haqiqiy Narx *</label>
                             <input
                                 className="input"
                                 name="realPrice"
@@ -129,6 +158,7 @@ const CreateSaleV2 = () => {
                                 placeholder="1000"
                                 value={formData.realPrice}
                                 onChange={handleChange}
+                                required
                             />
                         </div>
                     </div>
@@ -136,7 +166,7 @@ const CreateSaleV2 = () => {
                     {/* Percentage and Prices */}
                     <div className="responsive-grid mb-4">
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Foiz (%)</label>
+                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Foiz (%) *</label>
                             <input
                                 className="input"
                                 name="percentage"
@@ -144,6 +174,7 @@ const CreateSaleV2 = () => {
                                 placeholder="0"
                                 value={formData.percentage}
                                 onChange={handleChange}
+                                required
                             />
                         </div>
                         <div>
@@ -163,7 +194,7 @@ const CreateSaleV2 = () => {
                     {/* Payment Info */}
                     <div className="responsive-grid mb-4">
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Birinchi To'lov</label>
+                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Birinchi To'lov *</label>
                             <input
                                 className="input"
                                 name="firstPayment"
@@ -171,10 +202,11 @@ const CreateSaleV2 = () => {
                                 placeholder="0"
                                 value={formData.firstPayment}
                                 onChange={handleChange}
+                                required
                             />
                         </div>
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Muddat (oy)</label>
+                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Muddat (oy) *</label>
                             <input
                                 className="input"
                                 name="months"
@@ -182,6 +214,7 @@ const CreateSaleV2 = () => {
                                 placeholder="12"
                                 value={formData.months}
                                 onChange={handleChange}
+                                required
                             />
                         </div>
                     </div>
@@ -189,7 +222,7 @@ const CreateSaleV2 = () => {
                     {/* Monthly Payment */}
                     <div className="responsive-grid mb-4">
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Oylik To'lov Miqdori</label>
+                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Oylik To'lov Miqdori *</label>
                             <input
                                 className="input"
                                 name="monthlyPaymentAmount"
@@ -197,21 +230,38 @@ const CreateSaleV2 = () => {
                                 placeholder="100"
                                 value={formData.monthlyPaymentAmount}
                                 onChange={handleChange}
+                                required
                             />
                         </div>
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Tugallangan?</label>
+                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Tugallangan? *</label>
                             <select
                                 className="input"
                                 name="isDone"
                                 value={formData.isDone}
                                 onChange={(e) => setFormData({ ...formData, isDone: e.target.value === 'true' })}
                                 style={{ width: '100%' }}
+                                required
                             >
                                 <option value="false">Yo'q</option>
                                 <option value="true">Ha</option>
                             </select>
                         </div>
+                    </div>
+
+                    {/* Additional Information */}
+                    <div className="responsive-grid mb-4">
+                        <div>
+                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Apple ID</label>
+                            <input
+                                className="input"
+                                name="connectedAppleId"
+                                placeholder="example@icloud.com"
+                                value={formData.connectedAppleId}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div></div>
                     </div>
 
                     {/* Comment */}
