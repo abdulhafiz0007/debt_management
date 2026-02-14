@@ -11,6 +11,8 @@ const MainLayout = () => {
             case '/':
             case '/sales':
                 return 'Sotuvlar';
+            case '/create-sale':
+                return 'Yangi Sotuv';
             default:
                 return 'Boshqaruv';
         }

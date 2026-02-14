@@ -2,11 +2,13 @@
 import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { Plus, Search, Trash2, Edit2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import AddSaleForm from '../components/AddSaleForm';
 import EditSaleModal from '../components/EditSaleModal';
 
 const Sales = () => {
     const { sales, deleteSale, loading } = useStore();
+    const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [showAddModal, setShowAddModal] = useState(false);
     const [editingSale, setEditingSale] = useState(null);
@@ -90,9 +92,14 @@ const Sales = () => {
                         onChange={e => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <button className="btn btn-primary" onClick={() => setShowAddModal(!showAddModal)}>
-                    <Plus size={18} /> Yangi Sotuv
-                </button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                    <button className="btn btn-primary" onClick={() => setShowAddModal(!showAddModal)}>
+                        <Plus size={18} /> Yangi Sotuv
+                    </button>
+                    <button className="btn btn-primary" onClick={() => navigate('/create-sale')}>
+                        <Plus size={18} /> Yangi Sotuv v2
+                    </button>
+                </div>
             </div>
 
             {showAddModal && (

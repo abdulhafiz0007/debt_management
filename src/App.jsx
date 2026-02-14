@@ -5,6 +5,7 @@ import { StoreProvider } from './context/StoreContext';
 import { useStore } from './context/StoreContext';
 import MainLayout from './layouts/MainLayout';
 import Sales from './pages/Sales';
+import CreateSaleV2 from './pages/CreateSaleV2';
 import Login from './pages/Login';
 import { Navigate } from 'react-router-dom';
 
@@ -22,6 +23,7 @@ function App() {
           <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route index element={<Sales />} />
             <Route path="sales" element={<Sales />} />
+            <Route path="create-sale" element={<CreateSaleV2 />} />
           </Route>
         </Routes>
       </BrowserRouter>
