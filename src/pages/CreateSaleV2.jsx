@@ -373,6 +373,8 @@ const CreateSaleV2 = () => {
                     </div>
 
                     {/* Comment */}
+                    {/* Hidden - Comment section */}
+                    {/*
                     <div className="responsive-grid mb-4">
                         <div style={{gridColumn: '1 / -1'}}>
                             <label className="text-sm text-muted"
@@ -387,6 +389,7 @@ const CreateSaleV2 = () => {
                             />
                         </div>
                     </div>
+                    */}
 
                     {/* Monthly Payments Section */}
                     {monthlyPayments.length > 0 && (
@@ -410,7 +413,6 @@ const CreateSaleV2 = () => {
                                             <th style={{padding: '12px', textAlign: 'left', fontWeight: '600'}}>Sanasi</th>
                                             <th style={{padding: '12px', textAlign: 'left', fontWeight: '600'}}>To'langan Miqdor</th>
                                             <th style={{padding: '12px', textAlign: 'left', fontWeight: '600'}}>To'langan Sana</th>
-                                            <th style={{padding: '12px', textAlign: 'left', fontWeight: '600'}}>Izoh</th>
                                             <th style={{padding: '12px', textAlign: 'left', fontWeight: '600'}}>To'langan?</th>
                                         </tr>
                                     </thead>
@@ -454,26 +456,13 @@ const CreateSaleV2 = () => {
                                                         style={{width: '100%', padding: '6px'}}
                                                     />
                                                 </td>
-                                                <td style={{padding: '12px'}}>
+                                                <td style={{padding: '12px', textAlign: 'center'}}>
                                                     <input
-                                                        className="input"
-                                                        type="text"
-                                                        placeholder="Izoh"
-                                                        value={payment.comment}
-                                                        onChange={(e) => handlePaymentChange(index, 'comment', e.target.value)}
-                                                        style={{width: '100%', padding: '6px'}}
+                                                        type="checkbox"
+                                                        checked={payment.isPaid}
+                                                        onChange={(e) => handlePaymentChange(index, 'isPaid', e.target.checked)}
+                                                        style={{cursor: 'pointer', width: '18px', height: '18px'}}
                                                     />
-                                                </td>
-                                                <td style={{padding: '12px'}}>
-                                                    <select
-                                                        className="input"
-                                                        value={payment.isPaid}
-                                                        onChange={(e) => handlePaymentChange(index, 'isPaid', e.target.value === 'true')}
-                                                        style={{width: '100%', padding: '6px'}}
-                                                    >
-                                                        <option value="false">Yo'q</option>
-                                                        <option value="true">Ha</option>
-                                                    </select>
                                                 </td>
                                             </tr>
                                         ))}
