@@ -268,12 +268,13 @@ const CreateSaleV2 = () => {
                     <div className="responsive-grid mb-4">
                         <div style={{ gridColumn: '1 / -1' }}>
                             <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Izoh</label>
-                            <input
+                            <textarea
                                 className="input"
                                 name="comment"
                                 placeholder="Qo'shimcha ma'lumotlar..."
                                 value={formData.comment}
                                 onChange={handleChange}
+                                style={{ minHeight: '100px', resize: 'vertical' }}
                             />
                         </div>
                     </div>
