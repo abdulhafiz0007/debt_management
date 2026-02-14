@@ -1,20 +1,12 @@
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid'; // need to install uuid? or just use crypto.randomUUID
-
-// Simple UUID generator if uuid package not installed, but ideally use crypto.randomUUID
-const generateId = () => {
-    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-        return crypto.randomUUID();
-    }
-    return Math.random().toString(36).substring(2, 15);
-};
+import React, {createContext, useContext, useEffect, useState} from 'react';
+// need to install uuid? or just use crypto.randomUUID
 
 const StoreContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useStore = () => useContext(StoreContext);
 
-export const StoreProvider = ({ children }) => {
+export const StoreProvider = ({children}) => {
     const [sales, setSales] = useState([]);
     const [token, setToken] = useState(localStorage.getItem('apple555_token') || null);
     const [user, setUser] = useState(null);
@@ -72,8 +64,8 @@ export const StoreProvider = ({ children }) => {
         try {
             const response = await fetch(`${API_URL}/auth/sign-in`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username, password})
             });
 
             if (!response.ok) {
@@ -84,13 +76,13 @@ export const StoreProvider = ({ children }) => {
             const data = await response.json();
             if (data.accessToken) {
                 setToken(data.accessToken);
-                setUser({ username });
-                return { success: true };
+                setUser({username});
+                return {success: true};
             }
-            return { success: false, message: 'Token topilmadi' };
+            return {success: false, message: 'Token topilmadi'};
         } catch (error) {
             console.error('Login error:', error);
-            return { success: false, message: error.message };
+            return {success: false, message: error.message};
         }
     };
 
@@ -129,12 +121,12 @@ export const StoreProvider = ({ children }) => {
 
             if (response.ok) {
                 fetchSales(); // Refresh list
-                return { success: true };
+                return {success: true};
             }
-            return { success: false };
+            return {success: false};
         } catch (error) {
             console.error('Add sale error:', error);
-            return { success: false };
+            return {success: false};
         }
     };
 
@@ -142,7 +134,7 @@ export const StoreProvider = ({ children }) => {
         try {
             const response = await fetch(`${API_URL}/sales/${id}`, {
                 method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: {'Authorization': `Bearer ${token}`}
             });
             if (response.ok) {
                 setSales(prev => prev.filter(s => s.id !== id));
@@ -217,93 +209,12 @@ export const StoreProvider = ({ children }) => {
         return false;
     };
 
-    const updateMonthlyPayment = async (payment, explicitSaleId = null) => {
-        try {
-            // Standard update schema: /api/monthly-payments (PUT)
-            // CRITICAL FIX: Use explicitSaleId if provided, otherwise fallback to payment's own reference
-            // 'full-info' payments often lack the parent 'sale' reference to avoid recursion
-            const saleId = explicitSaleId || payment.sale?.id || payment.saleId;
-
-            if (!saleId) {
-                console.error('Update Payment Error: Missing saleId!');
-                return false;
-            }
-
-            // Construct the clean body
-            // FIX: Backend likely requires 'sale' object with ID to bind relationship, 
-            // even if flat 'saleId' is accepted by DTO but ignored by Hibernate save.
-            const body = {
-                id: payment.id,
-                expectedAmount: payment.expectedAmount,
-                expectedDate: payment.expectedDate,
-                paidAmount: payment.paidAmount || 0,
-                paidAt: payment.paidAt,
-                comment: payment.comment || '',
-                isPaid: payment.isPaid,
-                saleId: parseInt(saleId), // Send both flat ID (for DTO)
-                sale: { id: parseInt(saleId) } // AND nested object (for Hibernate)
-            };
-
-            console.log('PUT PAYMENT REQUEST (Flat saleId):', JSON.stringify(body, null, 2));
-
-            const response = await fetch(`${API_URL}/monthly-payments`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(body)
-            });
-
-            const resData = await response.json();
-            console.log('PUT PAYMENT RESPONSE:', response.status, JSON.stringify(resData, null, 2));
-
-            if (response.ok) {
-                // OPTIMISTIC/CONFIRMED LOCAL UPDATE
-                // The backend might return stale data on immediate fetch, so we update local state immediately
-                setSales(prevSales => {
-                    return prevSales.map(s => {
-                        // Try to match by explicit saleId or find the sale containing this payment
-                        const isTargetSale = explicitSaleId ? (s.id === parseInt(explicitSaleId)) : s.monthlyPayments.some(p => p.id === payment.id);
-
-                        if (isTargetSale) {
-                            // Calculate new "Paid Amount" for the sale
-                            const updatedPayments = s.monthlyPayments.map(p =>
-                                p.id === payment.id ? { ...p, ...resData } : p
-                            );
-
-                            // Re-calculate derived paidAmount directly
-                            const totalInstallmentsPaid = updatedPayments.reduce((sum, p) =>
-                                sum + (p.isPaid ? (p.paidAmount || 0) : 0), 0
-                            );
-                            const finalPaidAmount = (s.downPayment || 0) + totalInstallmentsPaid;
-
-                            return {
-                                ...s,
-                                monthlyPayments: updatedPayments,
-                                paidAmount: finalPaidAmount
-                            };
-                        }
-                        return s;
-                    });
-                });
-
-                return true;
-            } else {
-                console.error('PUT PAYMENT ERROR:', resData);
-            }
-        } catch (error) {
-            console.error('Update monthly payment error:', error);
-        }
-        return false;
-    };
-
     // Fetch single sale detailed info (New Endpoint)
     const fetchSaleById = async (id) => {
         if (!token) return null;
         try {
             const response = await fetch(`${API_URL}/sales/full-info/${id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: {'Authorization': `Bearer ${token}`}
             });
 
             if (response.ok) {
@@ -356,94 +267,12 @@ export const StoreProvider = ({ children }) => {
         };
     };
 
-    // Generate monthly payments for a sale
-    const generateMonthlyPayments = async (saleId) => {
-        try {
-            console.log(`Generating monthly payments for sale ${saleId}`);
-
-            // Find the sale
-            const sale = sales.find(s => s.id === saleId);
-            if (!sale) {
-                console.error('Sale not found');
-                return { success: false };
-            }
-
-            // Calculate monthly payment amount with precision handling
-            const remainingAmount = sale.totalPrice - sale.downPayment;
-
-            // Base monthly amount (floor to avoid overshooting, last month picks up remainder)
-            // OR Ceil and adjust last? Let's use standard logic:
-            // If we have 100 remaining and 3 months. 33, 33, 34.
-            const baseMonthlyAmount = Math.floor(remainingAmount / sale.durationMonths);
-            const remainder = remainingAmount % sale.durationMonths;
-
-            const startDate = new Date(sale.startDate);
-
-            // Create payment schedule
-            const createdPayments = [];
-            for (let i = 0; i < sale.durationMonths; i++) {
-                const expectedDate = new Date(startDate);
-                expectedDate.setMonth(expectedDate.getMonth() + i + 1);
-
-                // Distribute remainder across the first 'remainder' months, or add to last?
-                // Usually adding 1 to the first 'remainder' months is fairest and keeps payments similar.
-                // Example: 100/3 -> 34, 33, 33.
-                let amount = baseMonthlyAmount;
-                if (i < remainder) {
-                    amount += 1;
-                }
-
-                // If currency is UZS, maybe we want to round to nearest 100 or 1000?
-                // For now, let's keep it exact integer as per request.
-
-                const paymentBody = {
-                    expectedAmount: amount,
-                    expectedDate: expectedDate.toISOString().split('T')[0],
-                    paidAmount: 0,
-                    paidAt: null,
-                    comment: '',
-                    isPaid: false,
-                    sale: { id: saleId } // Link to sale
-                };
-
-                // Create payment on backend using standard POST endpoint
-                const response = await fetch(`${API_URL}/monthly-payments`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(paymentBody)
-                });
-
-                if (response.ok) {
-                    const created = await response.json();
-                    createdPayments.push(created);
-                }
-            }
-
-            console.log(`Created ${createdPayments.length} payments for sale ${saleId}`);
-
-            // Refresh list to get linked data
-            await fetchSales();
-
-            return { success: true, payments: createdPayments };
-        } catch (error) {
-            console.error('Generate monthly payments error:', error);
-            return { success: false, error };
-        }
-    };
-
     return (
         <StoreContext.Provider value={{
             sales,
             addSale,
             deleteSale,
             updateSale,
-            updateMonthlyPayment,
-            generateMonthlyPayments,
-            updateMonthlyPayment,
-            generateMonthlyPayments,
             fetchSales,
             fetchSaleById,
             token,

@@ -1,35 +1,41 @@
-
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, ShoppingCart, CreditCard, Users, Settings, LogOut } from 'lucide-react';
+import {NavLink} from 'react-router-dom';
+import {Settings, ShoppingCart} from 'lucide-react';
 
-const Sidebar = ({ isOpen, onClose }) => {
+const Sidebar = ({isOpen, onClose}) => {
     const navItems = [
-        { icon: <ShoppingCart size={20} />, label: 'Sotuvlar', path: '/sales' },
+        {icon: <ShoppingCart size={20}/>, label: 'Sotuvlar', path: '/sales'},
     ];
 
     return (
         <>
             <div className={`sidebar-overlay ${isOpen ? 'show' : ''}`} onClick={onClose}></div>
             <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
-                <div style={{ padding: '24px', borderBottom: '1px solid #334155' }}>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'white', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span style={{ color: '#4f46e5' }}>apple</span>555
+                <div style={{padding: '24px', borderBottom: '1px solid #334155'}}>
+                    <h1 style={{
+                        fontSize: '1.5rem',
+                        fontWeight: 'bold',
+                        color: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px'
+                    }}>
+                        <span style={{color: '#4f46e5'}}>apple</span>555
                     </h1>
-                    <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '5px' }}>Store Management v2.0</p>
+                    <p style={{fontSize: '0.8rem', color: '#94a3b8', marginTop: '5px'}}>Store Management v2.0</p>
                 </div>
 
-                <nav style={{ padding: '20px 10px', flex: 1 }}>
-                    <ul style={{ listStyle: 'none' }}>
+                <nav style={{padding: '20px 10px', flex: 1}}>
+                    <ul style={{listStyle: 'none'}}>
                         {navItems.map((item) => (
-                            <li key={item.path} style={{ marginBottom: '5px' }}>
+                            <li key={item.path} style={{marginBottom: '5px'}}>
                                 <NavLink
                                     to={item.path}
                                     onClick={onClose}
-                                    className={({ isActive }) =>
+                                    className={({isActive}) =>
                                         `btn ${isActive ? 'btn-primary' : ''}`
                                     }
-                                    style={({ isActive }) => ({
+                                    style={({isActive}) => ({
                                         width: '100%',
                                         justifyContent: 'flex-start',
                                         backgroundColor: isActive ? 'var(--primary)' : 'transparent',
@@ -46,9 +52,15 @@ const Sidebar = ({ isOpen, onClose }) => {
                     </ul>
                 </nav>
 
-                <div style={{ padding: '20px', borderTop: '1px solid #334155' }}>
-                    <button className="btn" style={{ width: '100%', color: '#94a3b8', justifyContent: 'flex-start', background: 'transparent', border: 'none' }}>
-                        <Settings size={20} /> Sozlamalar
+                <div style={{padding: '20px', borderTop: '1px solid #334155'}}>
+                    <button className="btn" style={{
+                        width: '100%',
+                        color: '#94a3b8',
+                        justifyContent: 'flex-start',
+                        background: 'transparent',
+                        border: 'none'
+                    }}>
+                        <Settings size={20}/> Sozlamalar
                     </button>
                 </div>
             </aside>

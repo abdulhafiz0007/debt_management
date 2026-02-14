@@ -1,8 +1,6 @@
-
-import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
-import { Outlet, useLocation } from 'react-router-dom';
+import {Outlet, useLocation} from 'react-router-dom';
 
 const MainLayout = () => {
     const location = useLocation();
@@ -11,18 +9,21 @@ const MainLayout = () => {
     const getTitle = () => {
         switch (location.pathname) {
             case '/':
-            case '/sales': return 'Sotuvlar';
-            default: return 'Boshqaruv';
+            case '/sales':
+                return 'Sotuvlar';
+            default:
+                return 'Boshqaruv';
         }
     };
 
     return (
-        <div style={{ display: 'flex', width: '100%', minHeight: '100vh' }}>
-            <Sidebar isOpen={false} onClose={() => { }} />
+        <div style={{display: 'flex', width: '100%', minHeight: '100vh'}}>
+            <Sidebar isOpen={false} onClose={() => {
+            }}/>
             <div className="main-content">
-                <Header title={getTitle()} />
+                <Header title={getTitle()}/>
                 <div className="page-content">
-                    <Outlet />
+                    <Outlet/>
                 </div>
             </div>
         </div>
