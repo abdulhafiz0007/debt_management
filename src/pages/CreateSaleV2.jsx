@@ -24,6 +24,33 @@ const CreateSaleV2 = () => {
         comment: 'Some comment here...'
     });
 
+    const [monthlyPayments, setMonthlyPayments] = useState([]);
+
+    // Generate monthly payments when months or monthlyPaymentAmount changes
+    const generateMonthlyPayments = (months, monthlyAmount) => {
+        const numMonths = Number(months) || 0;
+        const amount = Number(monthlyAmount) || 0;
+
+        const payments = [];
+        const startDate = new Date();
+
+        for (let i = 0; i < numMonths; i++) {
+            const expectedDate = new Date(startDate);
+            expectedDate.setMonth(expectedDate.getMonth() + (i + 1));
+
+            payments.push({
+                id: i,
+                expectedAmount: amount,
+                expectedDate: expectedDate.toISOString().split('T')[0],
+                paidAmount: 0,
+                paidAt: null,
+                comment: '',
+                isPaid: false
+            });
+        }
+        return payments;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -68,7 +95,15 @@ const CreateSaleV2 = () => {
                 isDone: formData.isDone,
                 connectedAppleId: (formData.connectedAppleId || '').trim(),
                 comment: (formData.comment || '').trim(),
-                soldAt: new Date().toISOString()
+                soldAt: new Date().toISOString(),
+                monthlyPayments: monthlyPayments.map(payment => ({
+                    expectedAmount: Number(payment.expectedAmount) || 0,
+                    expectedDate: payment.expectedDate,
+                    paidAmount: Number(payment.paidAmount) || 0,
+                    paidAt: payment.paidAt ? new Date(payment.paidAt).toISOString() : null,
+                    comment: (payment.comment || '').trim(),
+                    isPaid: payment.isPaid
+                }))
             };
 
             console.log('Calling addSale with payload:', salePayload);
@@ -95,7 +130,30 @@ const CreateSaleV2 = () => {
     };
 
     const handleChange = (e) => {
-        setFormData({...formData, [e.target.name]: e.target.value});
+        const {name, value} = e.target;
+        const updatedFormData = {...formData, [name]: value};
+        setFormData(updatedFormData);
+
+        // Regenerate monthly payments if months or monthlyPaymentAmount changes
+        if (name === 'months' || name === 'monthlyPaymentAmount') {
+            const payments = generateMonthlyPayments(updatedFormData.months, updatedFormData.monthlyPaymentAmount);
+            setMonthlyPayments(payments);
+        }
+    };
+
+    const handlePaymentChange = (index, field, value) => {
+        const updatedPayments = [...monthlyPayments];
+        updatedPayments[index] = {
+            ...updatedPayments[index],
+            [field]: value
+        };
+        setMonthlyPayments(updatedPayments);
+    };
+
+    const handlePaymentDateChange = (index, date) => {
+        const updatedPayments = [...monthlyPayments];
+        updatedPayments[index].expectedDate = date;
+        setMonthlyPayments(updatedPayments);
     };
 
     return (
@@ -329,6 +387,101 @@ const CreateSaleV2 = () => {
                             />
                         </div>
                     </div>
+
+                    {/* Monthly Payments Section */}
+                    {monthlyPayments.length > 0 && (
+                        <div style={{marginTop: '32px'}}>
+                            <h4 style={{marginBottom: '16px', color: 'var(--text)'}}>Oylik To'lovlar Jadvali ({monthlyPayments.length})</h4>
+                            <div style={{
+                                overflowX: 'auto',
+                                border: '1px solid var(--border-color)',
+                                borderRadius: '6px',
+                                marginBottom: '16px'
+                            }}>
+                                <table style={{
+                                    width: '100%',
+                                    borderCollapse: 'collapse',
+                                    fontSize: '14px'
+                                }}>
+                                    <thead>
+                                        <tr style={{backgroundColor: 'var(--bg-secondary)', borderBottom: '1px solid var(--border-color)'}}>
+                                            <th style={{padding: '12px', textAlign: 'left', fontWeight: '600'}}>№</th>
+                                            <th style={{padding: '12px', textAlign: 'left', fontWeight: '600'}}>Kutilayotgan Miqdor</th>
+                                            <th style={{padding: '12px', textAlign: 'left', fontWeight: '600'}}>Sanasi</th>
+                                            <th style={{padding: '12px', textAlign: 'left', fontWeight: '600'}}>To'langan Miqdor</th>
+                                            <th style={{padding: '12px', textAlign: 'left', fontWeight: '600'}}>To'langan Sana</th>
+                                            <th style={{padding: '12px', textAlign: 'left', fontWeight: '600'}}>Izoh</th>
+                                            <th style={{padding: '12px', textAlign: 'left', fontWeight: '600'}}>To'langan?</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {monthlyPayments.map((payment, index) => (
+                                            <tr key={index} style={{borderBottom: '1px solid var(--border-color)'}}>
+                                                <td style={{padding: '12px'}}>{index + 1}</td>
+                                                <td style={{padding: '12px'}}>
+                                                    <input
+                                                        className="input"
+                                                        type="number"
+                                                        value={payment.expectedAmount}
+                                                        onChange={(e) => handlePaymentChange(index, 'expectedAmount', Number(e.target.value))}
+                                                        style={{width: '100%', padding: '6px'}}
+                                                    />
+                                                </td>
+                                                <td style={{padding: '12px'}}>
+                                                    <input
+                                                        className="input"
+                                                        type="date"
+                                                        value={payment.expectedDate}
+                                                        onChange={(e) => handlePaymentDateChange(index, e.target.value)}
+                                                        style={{width: '100%', padding: '6px'}}
+                                                    />
+                                                </td>
+                                                <td style={{padding: '12px'}}>
+                                                    <input
+                                                        className="input"
+                                                        type="number"
+                                                        value={payment.paidAmount}
+                                                        onChange={(e) => handlePaymentChange(index, 'paidAmount', Number(e.target.value))}
+                                                        style={{width: '100%', padding: '6px'}}
+                                                    />
+                                                </td>
+                                                <td style={{padding: '12px'}}>
+                                                    <input
+                                                        className="input"
+                                                        type="date"
+                                                        value={payment.paidAt || ''}
+                                                        onChange={(e) => handlePaymentChange(index, 'paidAt', e.target.value || null)}
+                                                        style={{width: '100%', padding: '6px'}}
+                                                    />
+                                                </td>
+                                                <td style={{padding: '12px'}}>
+                                                    <input
+                                                        className="input"
+                                                        type="text"
+                                                        placeholder="Izoh"
+                                                        value={payment.comment}
+                                                        onChange={(e) => handlePaymentChange(index, 'comment', e.target.value)}
+                                                        style={{width: '100%', padding: '6px'}}
+                                                    />
+                                                </td>
+                                                <td style={{padding: '12px'}}>
+                                                    <select
+                                                        className="input"
+                                                        value={payment.isPaid}
+                                                        onChange={(e) => handlePaymentChange(index, 'isPaid', e.target.value === 'true')}
+                                                        style={{width: '100%', padding: '6px'}}
+                                                    >
+                                                        <option value="false">Yo'q</option>
+                                                        <option value="true">Ha</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
 
                     <div style={{display: 'flex', gap: '12px', justifyContent: 'flex-end'}}>
                         <button

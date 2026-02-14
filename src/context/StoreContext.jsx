@@ -116,7 +116,15 @@ export const StoreProvider = ({children}) => {
                 isDone: saleData.isDone || false,
                 connectedAppleId: saleData.connectedAppleId || '',
                 soldAt: saleData.soldAt,
-                comment: saleData.comment || ''
+                comment: saleData.comment || '',
+                monthlyPayments: (saleData.monthlyPayments || []).map(payment => ({
+                    expectedAmount: Number(payment.expectedAmount) || 0,
+                    expectedDate: payment.expectedDate,
+                    paidAmount: Number(payment.paidAmount) || 0,
+                    paidAt: payment.paidAt ? payment.paidAt : null,
+                    comment: payment.comment || '',
+                    isPaid: payment.isPaid || false
+                }))
             };
 
             console.log('Request body:', JSON.stringify(body, null, 2));
@@ -145,6 +153,7 @@ export const StoreProvider = ({children}) => {
                 try {
                     const result = JSON.parse(responseText);
                     console.log('Sale added successfully:', result);
+                    // eslint-disable-next-line no-unused-vars
                 } catch (e) {
                     console.log('Response was not JSON, but status was ok');
                 }
@@ -155,6 +164,7 @@ export const StoreProvider = ({children}) => {
                 try {
                     errorData = JSON.parse(responseText);
                     console.error('Error response JSON:', errorData);
+                    // eslint-disable-next-line no-unused-vars
                 } catch (e) {
                     console.error('Could not parse error response, using status text');
                     errorData = {message: response.statusText};
