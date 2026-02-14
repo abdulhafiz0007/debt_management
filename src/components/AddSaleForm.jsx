@@ -75,6 +75,7 @@ const AddSaleForm = ({ onSuccess }) => {
                         placeholder="+998 90 123 45 67"
                         value={formData.phoneNumber}
                         onChange={handleChange}
+                        required
                     />
                 </div>
             </div>
@@ -153,6 +154,7 @@ const AddSaleForm = ({ onSuccess }) => {
                         placeholder="Model, xotira, rang..."
                         value={formData.note}
                         onChange={handleChange}
+                        required
                     />
                 </div>
             </div>

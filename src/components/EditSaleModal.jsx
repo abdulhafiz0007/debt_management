@@ -175,7 +175,11 @@ const EditSaleModal = ({ sale: propSale, onClose }) => {
     const formatDateShort = (dateStr) => {
         if (!dateStr) return '';
         const date = new Date(dateStr);
-        return date.toLocaleDateString('uz-UZ', { month: 'short', year: 'numeric' });
+        const monthNames = [
+            'Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun',
+            'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'
+        ];
+        return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
     };
 
     return (

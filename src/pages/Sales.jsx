@@ -50,6 +50,33 @@ const Sales = () => {
         return <span className="badge badge-danger">Boshlanmagan</span>;
     };
 
+    const getNextPaymentInfo = (sale) => {
+        const payments = sale.monthlyPayments || [];
+        // Find the first unpaid payment sorted by date
+        const unpaid = payments
+            .filter(p => !p.isPaid)
+            .sort((a, b) => new Date(a.expectedDate) - new Date(b.expectedDate));
+
+        if (unpaid.length === 0) return { text: 'Tugallangan', color: 'var(--success)', bg: 'rgba(34,197,94,0.1)' };
+
+        const nextDate = new Date(unpaid[0].expectedDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        nextDate.setHours(0, 0, 0, 0);
+
+        const diffDays = Math.ceil((nextDate - today) / (1000 * 60 * 60 * 24));
+
+        const dateStr = nextDate.toLocaleDateString('uz-UZ', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+        if (diffDays < 0) {
+            return { text: `${dateStr} (${Math.abs(diffDays)} kun o'tgan)`, color: '#ef4444', bg: 'rgba(239,68,68,0.1)' };
+        } else if (diffDays <= 5) {
+            return { text: `${dateStr} (${diffDays} kun qoldi)`, color: '#f59e0b', bg: 'rgba(245,158,11,0.1)' };
+        } else {
+            return { text: dateStr, color: '#22c55e', bg: 'rgba(34,197,94,0.1)' };
+        }
+    };
+
     return (
         <div>
             <div className="flex-between mb-4">
@@ -93,6 +120,7 @@ const Sales = () => {
                                 <th>Mahsulot</th>
                                 <th>Narx</th>
                                 <th>To'langan</th>
+                                <th>Keyingi to'lov</th>
                                 <th>Holat</th>
                                 <th>Amallar</th>
                             </tr>
@@ -100,7 +128,7 @@ const Sales = () => {
                         <tbody>
                             {loading && sales.length === 0 ? (
                                 <tr>
-                                    <td colSpan={8} style={{ textAlign: 'center', padding: '32px' }}>
+                                    <td colSpan={9} style={{ textAlign: 'center', padding: '32px' }}>
                                         <div className="text-muted">Yuklanmoqda...</div>
                                     </td>
                                 </tr>
@@ -112,6 +140,24 @@ const Sales = () => {
                                     <td>{sale.note || '-'}</td>
                                     <td>{formatPrice(sale.totalPrice, sale.currency)}</td>
                                     <td>{formatPrice(sale.paidAmount || 0, sale.currency)}</td>
+                                    <td>
+                                        {(() => {
+                                            const info = getNextPaymentInfo(sale);
+                                            return (
+                                                <span style={{
+                                                    color: info.color,
+                                                    fontWeight: 600,
+                                                    fontSize: '0.85rem',
+                                                    background: info.bg,
+                                                    padding: '4px 8px',
+                                                    borderRadius: '6px',
+                                                    whiteSpace: 'nowrap'
+                                                }}>
+                                                    {info.text}
+                                                </span>
+                                            );
+                                        })()}
+                                    </td>
                                     <td>{getStatus(sale)}</td>
                                     <td>
                                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -139,7 +185,7 @@ const Sales = () => {
                             ))}
                             {filteredSales.length === 0 && (
                                 <tr>
-                                    <td colSpan={8} style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>
+                                    <td colSpan={9} style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>
                                         Ma'lumot topilmadi
                                     </td>
                                 </tr>
