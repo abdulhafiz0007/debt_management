@@ -6,31 +6,39 @@ import { useNavigate } from 'react-router-dom';
 const CreateSaleV2 = () => {
     const { addSale } = useStore();
     const navigate = useNavigate();
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
-        customerName: '',
-        phoneNumber: '',
-        note: '',
-        totalPrice: '',
-        downPayment: '0',
+        buyer: '',
+        productName: '',
         currency: 'USD',
-        durationMonths: '12',
-        startDate: new Date().toISOString().split('T')[0],
-        appleId: '',
+        realPrice: '',
+        percentage: '',
+        finalPrice: '',
+        firstPayment: '',
+        months: '',
+        monthlyPaymentAmount: '',
+        isDone: false,
         comment: ''
     });
 
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.customerName || !formData.totalPrice) return;
+        if (!formData.buyer || !formData.productName || !formData.finalPrice) return;
 
         setIsSubmitting(true);
         const result = await addSale({
-            ...formData,
-            totalPrice: Number(formData.totalPrice),
-            downPayment: Number(formData.downPayment),
-            durationMonths: Number(formData.durationMonths)
+            buyer: formData.buyer,
+            productName: formData.productName,
+            currency: formData.currency,
+            realPrice: Number(formData.realPrice) || 0,
+            percentage: Number(formData.percentage) || 0,
+            finalPrice: Number(formData.finalPrice),
+            firstPayment: Number(formData.firstPayment) || 0,
+            months: Number(formData.months) || 0,
+            monthlyPaymentAmount: Number(formData.monthlyPaymentAmount) || 0,
+            isDone: formData.isDone,
+            comment: formData.comment,
+            soldAt: new Date().toISOString()
         });
 
         setIsSubmitting(false);
@@ -65,68 +73,103 @@ const CreateSaleV2 = () => {
 
             <div className="card">
                 <form onSubmit={handleSubmit}>
+                    {/* Buyer Section */}
                     <div className="responsive-grid mb-4">
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Mijoz F.I.O</label>
+                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Xaridor F.I.O *</label>
                             <input
                                 className="input"
-                                name="customerName"
+                                name="buyer"
                                 placeholder="Masalan: Eshmat Toshmatov"
-                                value={formData.customerName}
+                                value={formData.buyer}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
-                        <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Telefon Raqam</label>
+                        <div></div>
+                    </div>
+
+                    {/* Product Section */}
+                    <div className="responsive-grid mb-4">
+                        <div style={{ gridColumn: '1 / -1' }}>
+                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Mahsulot Nomi *</label>
                             <input
                                 className="input"
-                                name="phoneNumber"
-                                placeholder="+998 90 123 45 67"
-                                value={formData.phoneNumber}
+                                name="productName"
+                                placeholder="Masalan: iPhone 15 Pro Max"
+                                value={formData.productName}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
                     </div>
 
+                    {/* Currency and Pricing */}
                     <div className="responsive-grid mb-4">
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Valyuta</label>
+                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Valyuta *</label>
                             <select
                                 className="input"
                                 name="currency"
                                 value={formData.currency}
                                 onChange={handleChange}
                                 style={{ width: '100%' }}
+                                required
                             >
                                 <option value="USD">USD ($)</option>
                                 <option value="UZS">UZS (so'm)</option>
                             </select>
                         </div>
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Umumiy Narx</label>
+                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Haqiqiy Narx</label>
                             <input
                                 className="input"
-                                name="totalPrice"
+                                name="realPrice"
+                                type="number"
+                                placeholder="1000"
+                                value={formData.realPrice}
+                                onChange={handleChange}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Percentage and Prices */}
+                    <div className="responsive-grid mb-4">
+                        <div>
+                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Foiz (%)</label>
+                            <input
+                                className="input"
+                                name="percentage"
+                                type="number"
+                                placeholder="0"
+                                value={formData.percentage}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div>
+                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Yakuniy Narx *</label>
+                            <input
+                                className="input"
+                                name="finalPrice"
                                 type="number"
                                 placeholder="1200"
-                                value={formData.totalPrice}
+                                value={formData.finalPrice}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
                     </div>
 
+                    {/* Payment Info */}
                     <div className="responsive-grid mb-4">
                         <div>
                             <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Birinchi To'lov</label>
                             <input
                                 className="input"
-                                name="downPayment"
+                                name="firstPayment"
                                 type="number"
                                 placeholder="0"
-                                value={formData.downPayment}
+                                value={formData.firstPayment}
                                 onChange={handleChange}
                             />
                         </div>
@@ -134,54 +177,47 @@ const CreateSaleV2 = () => {
                             <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Muddat (oy)</label>
                             <input
                                 className="input"
-                                name="durationMonths"
+                                name="months"
                                 type="number"
                                 placeholder="12"
-                                value={formData.durationMonths}
+                                value={formData.months}
                                 onChange={handleChange}
-                                required
                             />
                         </div>
                     </div>
 
+                    {/* Monthly Payment */}
                     <div className="responsive-grid mb-4">
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Boshlanish Sanasi</label>
+                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Oylik To'lov Miqdori</label>
                             <input
                                 className="input"
-                                name="startDate"
-                                type="date"
-                                value={formData.startDate}
+                                name="monthlyPaymentAmount"
+                                type="number"
+                                placeholder="100"
+                                value={formData.monthlyPaymentAmount}
                                 onChange={handleChange}
-                                required
                             />
                         </div>
                         <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Mahsulot (Note)</label>
-                            <input
+                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Tugallangan?</label>
+                            <select
                                 className="input"
-                                name="note"
-                                placeholder="Model, xotira, rang..."
-                                value={formData.note}
-                                onChange={handleChange}
-                                required
-                            />
+                                name="isDone"
+                                value={formData.isDone}
+                                onChange={(e) => setFormData({ ...formData, isDone: e.target.value === 'true' })}
+                                style={{ width: '100%' }}
+                            >
+                                <option value="false">Yo'q</option>
+                                <option value="true">Ha</option>
+                            </select>
                         </div>
                     </div>
 
+                    {/* Comment */}
                     <div className="responsive-grid mb-4">
-                        <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Apple ID</label>
-                            <input
-                                className="input"
-                                name="appleId"
-                                placeholder="example@icloud.com"
-                                value={formData.appleId}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div>
-                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Izoh (Comment)</label>
+                        <div style={{ gridColumn: '1 / -1' }}>
+                            <label className="text-sm text-muted" style={{ display: 'block', marginBottom: '4px' }}>Izoh</label>
                             <input
                                 className="input"
                                 name="comment"
