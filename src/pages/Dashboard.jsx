@@ -1,23 +1,21 @@
+import React, {useMemo} from 'react';
+import {useStore} from '../context/StoreContext';
+import {AlertCircle, DollarSign, TrendingUp, Users} from 'lucide-react';
 
-import React, { useMemo } from 'react';
-import { useStore } from '../context/StoreContext';
-import { DollarSign, Users, AlertCircle, TrendingUp } from 'lucide-react';
-
-const StatCard = ({ title, value, icon: Icon, color, trend }) => (
-    <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+const StatCard = ({title, value, color, trend}) => (
+    <div className="card" style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
         <div>
             <p className="text-muted text-sm">{title}</p>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginTop: '5px' }}>{value}</h3>
-            {trend && <p style={{ fontSize: '0.8rem', color: '#10b981', marginTop: '5px' }}>{trend}</p>}
+            <h3 style={{fontSize: '1.5rem', fontWeight: 'bold', marginTop: '5px'}}>{value}</h3>
+            {trend && <p style={{fontSize: '0.8rem', color: '#10b981', marginTop: '5px'}}>{trend}</p>}
         </div>
-        <div style={{ padding: '12px', borderRadius: '12px', background: color, color: 'white' }}>
-            <Icon size={24} />
+        <div style={{padding: '12px', borderRadius: '12px', background: color, color: 'white'}}>
         </div>
     </div>
 );
 
 const Dashboard = () => {
-    const { sales } = useStore();
+    const {sales} = useStore();
 
     const stats = useMemo(() => {
         let totalDebt = 0;
@@ -51,9 +49,10 @@ const Dashboard = () => {
 
     return (
         <div>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: 'bold', marginBottom: '24px' }}>Umumiy Holat</h1>
+            <h1 style={{fontSize: '1.8rem', fontWeight: 'bold', marginBottom: '24px'}}>Umumiy Holat</h1>
 
-            <div className="grid-cols-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px' }}>
+            <div className="grid-cols-2"
+                 style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px'}}>
                 <StatCard
                     title="Jami Qarzlar"
                     value={`$${stats.totalDebt.toLocaleString()}`}
@@ -82,7 +81,7 @@ const Dashboard = () => {
 
             {/* Recent Activity or Quick Actions could go here */}
             <div className="mt-4 card">
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '16px' }}>Tezkor Eslatmalar</h3>
+                <h3 style={{fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '16px'}}>Tezkor Eslatmalar</h3>
                 <p className="text-muted">Bugungi to'lovlar va kechikkan to'lovlar shu yerda ko'rinadi (Tez orada).</p>
             </div>
         </div>
