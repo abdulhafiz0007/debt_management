@@ -13,10 +13,12 @@ const Sales = () => {
 
     const sortedSales = [...sales].sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
 
-    const filteredSales = sortedSales.filter(sale =>
-        sale.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        sale.phoneNumber.includes(searchTerm)
-    );
+    const filteredSales = sortedSales.filter(sale => {
+        const name = (sale.customerName || '').toLowerCase();
+        const phone = (sale.phoneNumber || '').toLowerCase();
+        const search = searchTerm.toLowerCase();
+        return name.includes(search) || phone.includes(search);
+    });
 
     const formatDate = (dateStr) => {
         if (!dateStr) return '-';
@@ -28,14 +30,16 @@ const Sales = () => {
     };
 
     const formatPrice = (amount, currency) => {
+        const val = amount || 0;
         if (currency === 'UZS') {
-            return `${amount.toLocaleString()} so'm`;
+            return `${val.toLocaleString()} so'm`;
         }
-        return `$${amount.toLocaleString()}`;
+        return `$${val.toLocaleString()}`;
     };
 
     const calculatePaidAmount = (sale) => {
-        return sale.paidAmount || 0;
+        const scheduleSum = (sale.monthlyPayments || []).reduce((sum, p) => sum + (p.paidAmount || 0), 0);
+        return (sale.downPayment || 0) + scheduleSum;
     };
 
     const getStatus = (sale) => {
@@ -107,7 +111,7 @@ const Sales = () => {
                                     <td className="text-muted">{sale.phoneNumber}</td>
                                     <td>{sale.note || '-'}</td>
                                     <td>{formatPrice(sale.totalPrice, sale.currency)}</td>
-                                    <td>{formatPrice(calculatePaidAmount(sale), sale.currency)}</td>
+                                    <td>{formatPrice(sale.paidAmount || 0, sale.currency)}</td>
                                     <td>{getStatus(sale)}</td>
                                     <td>
                                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>

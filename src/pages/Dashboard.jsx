@@ -27,7 +27,11 @@ const Dashboard = () => {
 
         sales.forEach(sale => {
             uniqueCustomers.add(sale.phoneNumber);
-            const paid = sale.paidAmount || 0;
+
+            // Calculate total paid: downPayment + sum of all paid installments
+            const scheduleSum = (sale.monthlyPayments || []).reduce((sum, p) => sum + (p.paidAmount || 0), 0);
+            const paid = (sale.downPayment || 0) + scheduleSum;
+
             const remaining = sale.totalPrice - paid;
 
             totalCollected += paid;
